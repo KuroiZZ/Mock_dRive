@@ -1,9 +1,12 @@
 package org.example.SessionSystem;
 
 import org.example.Connection;
+import org.example.User.Role;
 import org.example.User.User;
 
 import java.sql.*;
+import java.util.UUID;
+import org.mindrot.jbcrypt.BCrypt;
 
 public class Session
 {
@@ -59,21 +62,31 @@ public class Session
         return false;
     }
 
-    static public void CreateUser(User user) throws SQLException
+    static public String  EncryptPassword(String Password)
     {
-        if (!UserNameAlreadyExist(user.getUserName()) && !UserIdAlreadyExist(user.getUserId()))
+        String salt = BCrypt.gensalt();
+        return BCrypt.hashpw(Password, salt);
+    }
+
+    static public void Register(String User_Name, String First_Name, String Last_Name, String Password) throws SQLException
+    {
+
+        String User_Id = UUID.randomUUID().toString();
+        String Encrypted_Password = EncryptPassword(Password);
+
+        if (!UserNameAlreadyExist(User_Name) && !UserIdAlreadyExist(User_Id))
         {
             java.sql.Connection connection = (java.sql.Connection) DriverManager.getConnection(Connection.url, Connection.user, Connection.password);
 
             String query = "INSERT INTO user (User_Id, User_Name, First_Name, Last_Name, Password, Role) VALUES(?,?,?,?,?,?);";
 
             PreparedStatement stmt = connection.prepareStatement(query);
-            stmt.setString(1, user.getUserId());
-            stmt.setString(2, user.getUserName());
-            stmt.setString(3, user.getFirstName());
-            stmt.setString(4, user.getLastName());
-            stmt.setString(5, user.getPassword());
-            stmt.setString(6, user.getRole());
+            stmt.setString(1, User_Id);
+            stmt.setString(2, User_Name);
+            stmt.setString(3, First_Name);
+            stmt.setString(4, Last_Name);
+            stmt.setString(5, Encrypted_Password);
+            stmt.setString(6, Role.CUSTOMER.toString());
 
             stmt.execute();
             System.out.println("User Added Successfully");
@@ -84,11 +97,14 @@ public class Session
         {
             System.out.println("User Already Exist");
         }
+    }
 
+    public void LogIn()
+    {
 
     }
 
-    public void LogIn(){}
-
     public void LogOut(){}
+
+
 }
