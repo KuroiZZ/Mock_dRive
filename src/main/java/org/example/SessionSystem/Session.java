@@ -1,10 +1,12 @@
 package org.example.SessionSystem;
 
 import org.example.Connection;
+import org.example.User.Admin;
 import org.example.User.Role;
 import org.example.User.User;
 
 import java.sql.*;
+import java.util.Objects;
 import java.util.UUID;
 import org.mindrot.jbcrypt.BCrypt;
 
@@ -99,9 +101,48 @@ public class Session
         }
     }
 
-    public void LogIn()
+    static public User LogIn(String User_Name, String Password) throws SQLException
     {
+        java.sql.Connection connection = (java.sql.Connection) DriverManager.getConnection(Connection.url, Connection.user, Connection.password);
 
+        String querySelect = "SELECT * from user WHERE User_Name = ?";
+        PreparedStatement stmt = connection.prepareStatement(querySelect);
+        stmt.setString(1, User_Name);
+        ResultSet rs = stmt.executeQuery();
+
+        User logged_user = null;
+        if (rs != null)
+        {
+            while (rs.next())
+            {
+                if(BCrypt.checkpw(Password, rs.getString(5)))
+                {
+                    if (Objects.equals(rs.getString(6), "USER"))
+                    {
+                        logged_user = new User(rs.getString(1), rs.getString(2), rs.getString(3),
+                                rs.getString(4), rs.getString(5));
+                    }
+                    else
+                    {
+                        logged_user = new Admin(rs.getString(1), rs.getString(2), rs.getString(3),
+                                rs.getString(4), rs.getString(5));
+                    }
+                    System.out.println("User logged in");
+                }
+                else
+                {
+                    System.out.println("User name or password is incorrect");
+                }
+            }
+        }
+        else
+        {
+            System.out.println("User name or password is incorrect");
+        }
+        stmt.close();
+        connection.close();
+
+        return logged_user;
     }
 
     public void LogOut(){}
