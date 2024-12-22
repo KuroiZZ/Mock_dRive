@@ -1,6 +1,8 @@
 package org.example.GUI;
 
+import com.mysql.cj.log.Log;
 import org.example.SessionSystem.Session;
+import org.example.User.User;
 
 import javax.swing.*;
 import java.awt.*;
@@ -32,27 +34,49 @@ public class GUI_Elements
     {
         Window.setSize(600, 400);
         Window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        Window.getContentPane().setBackground(Color.BLACK);
+        Window.getContentPane().setBackground(Color.RED);
     }
 
     public static void InitializeLogInMenu()
     {
+        //--
         JPanel LogInPanel = new JPanel(new GridBagLayout());
-        LogInPanel.setPreferredSize(new Dimension(960, 540));
-        LogInPanel.setBackground(Color.BLACK);
+        LogInPanel.setBackground(Color.BLUE);
+        //--
 
+        //--
+        JPanel User_Name_Panel = new JPanel(new FlowLayout());
+        User_Name_Panel.setOpaque(false);
+
+        JLabel User_Name = new JLabel("Username:");
+        User_Name.setFont(new Font(Font.SERIF, Font.BOLD, 25));
+        User_Name_Panel.add(User_Name);
 
         JTextField User_Name_Field = new JTextField(15);
         User_Name_Field.setPreferredSize(new Dimension(0, 30));
-        LogInPanel.add(User_Name_Field, setConstraints(1, 1, 0 ,0));
+        User_Name_Panel.add(User_Name_Field);
 
+        LogInPanel.add(User_Name_Panel, setConstraints(1, 1, 0 ,0));
+        //--
 
-        JTextField Password_Field = new JTextField(15);
+        //--
+        JPanel Password_Panel = new JPanel(new FlowLayout());
+        Password_Panel.setOpaque(false);
+
+        JLabel Password = new JLabel("Password:");
+        Password.setFont(new Font(Font.SERIF, Font.BOLD, 25));
+        Password_Panel.add(Password);
+
+        JPasswordField Password_Field = new JPasswordField(15);
         Password_Field.setPreferredSize(new Dimension(0, 30));
-        LogInPanel.add(Password_Field, setConstraints(1,1,0,1));
+        Password_Panel.add(Password_Field);
 
+        LogInPanel.add(Password_Panel,  setConstraints(1,1,0,1));
+        //--
 
+        //--
         JButton LogIn_Button = new JButton("Log In");
+        LogIn_Button.setPreferredSize(new Dimension(300, 30));
         LogIn_Button.addActionListener(new ActionListener()
         {
             @Override
@@ -69,10 +93,15 @@ public class GUI_Elements
             }
         });
         LogInPanel.add(LogIn_Button, setConstraints(1,1,0,2));
+        //--
 
-
-        Window.add(LogInPanel);
+        Window.add(LogInPanel, BorderLayout.CENTER);
         Window.setVisible(true);
+    }
+
+    public static void InitializeRegisterMenu()
+    {
+
     }
 
 }
