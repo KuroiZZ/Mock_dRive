@@ -2,21 +2,21 @@ package org.example.User;
 
 public class User
 {
-    private String UserId;
-    private String UserName;
-    private String FirstName;
-    private String LastName;
-    private String Password;
-    private Role Role;
+    protected String UserId;
+    protected String UserName;
+    protected String FirstName;
+    protected String LastName;
+    protected String Password;
+    protected Role Role;
 
-    public User(String userId, String userName, String firstName, String lastName, String password, org.example.User.Role role)
+    public User(String userId, String userName, String firstName, String lastName, String password)
     {
         UserId = userId;
         UserName = userName;
         FirstName = firstName;
         LastName = lastName;
         Password = password;
-        Role = role;
+        Role = org.example.User.Role.CUSTOMER;
     }
 
     public void ChangeUserName(){}

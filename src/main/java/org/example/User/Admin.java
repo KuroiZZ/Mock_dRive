@@ -2,9 +2,10 @@ package org.example.User;
 
 public class Admin extends User
 {
-    public Admin(String userId, String userName, String firstName, String lastName, String password, org.example.User.Role role)
+    public Admin(String userId, String userName, String firstName, String lastName, String password)
     {
-        super(userId, userName, firstName, lastName, password, role);
+        super(userId, userName, firstName, lastName, password);
+        this.Role = org.example.User.Role.ADMIN;
     }
 
     public void ChangeSelectedUserStorageLimit(){}
