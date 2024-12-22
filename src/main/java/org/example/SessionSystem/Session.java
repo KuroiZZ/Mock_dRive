@@ -105,40 +105,43 @@ public class Session
     {
         java.sql.Connection connection = (java.sql.Connection) DriverManager.getConnection(Connection.url, Connection.user, Connection.password);
 
+        if (!UserNameAlreadyExist(User_Name))
+        {
+            System.out.println("User name or password is incorrect");
+            return null;
+        }
+
         String querySelect = "SELECT * from user WHERE User_Name = ?";
         PreparedStatement stmt = connection.prepareStatement(querySelect);
         stmt.setString(1, User_Name);
         ResultSet rs = stmt.executeQuery();
 
         User logged_user = null;
-        if (rs != null)
+
+
+        while (rs.next())
         {
-            while (rs.next())
+            if(BCrypt.checkpw(Password, rs.getString(5)))
             {
-                if(BCrypt.checkpw(Password, rs.getString(5)))
+                if (Objects.equals(rs.getString(6), "USER"))
                 {
-                    if (Objects.equals(rs.getString(6), "USER"))
-                    {
-                        logged_user = new User(rs.getString(1), rs.getString(2), rs.getString(3),
-                                rs.getString(4), rs.getString(5));
-                    }
-                    else
-                    {
-                        logged_user = new Admin(rs.getString(1), rs.getString(2), rs.getString(3),
-                                rs.getString(4), rs.getString(5));
-                    }
-                    System.out.println("User logged in");
+                    logged_user = new User(rs.getString(1), rs.getString(2), rs.getString(3),
+                            rs.getString(4), rs.getString(5));
                 }
                 else
                 {
-                    System.out.println("User name or password is incorrect");
+                    logged_user = new Admin(rs.getString(1), rs.getString(2), rs.getString(3),
+                            rs.getString(4), rs.getString(5));
                 }
+                System.out.println("User logged in");
+            }
+            else
+            {
+                System.out.println("User name or password is incorrect");
             }
         }
-        else
-        {
-            System.out.println("User name or password is incorrect");
-        }
+
+
         stmt.close();
         connection.close();
 
