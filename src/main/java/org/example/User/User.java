@@ -1,5 +1,15 @@
 package org.example.User;
 
+import org.example.Connection;
+import org.example.SessionSystem.Session;
+
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Objects;
+import java.util.UUID;
+
 public class User
 {
     protected String UserId;
@@ -25,7 +35,39 @@ public class User
 
     public void UploadFile(){}
 
-    public void SelectTeamMate(){}
+    public void SelectTeamMate(String TeammateName) throws SQLException
+    {
+        java.sql.Connection connection = (java.sql.Connection) DriverManager.getConnection(Connection.url, Connection.user, Connection.password);
+
+        if (Session.UserNameAlreadyExist(TeammateName) && !Objects.equals(this.UserName, TeammateName))
+        {
+            String querySelect = "SELECT User_Id from user WHERE User_Name = ?";
+            PreparedStatement stmt = connection.prepareStatement(querySelect);
+            stmt.setString(1, TeammateName);
+            ResultSet rs = stmt.executeQuery();
+            stmt.clearParameters();
+
+            String Teammate_Id = null;
+            while (rs.next())
+            {
+                Teammate_Id = rs.getString(1);
+            }
+
+            if (Teammate_Id != null)
+            {
+                String query = "INSERT INTO team (Team_Id, Team_Leader, Team_Member) VALUES(?,?,?);";
+
+                stmt = connection.prepareStatement(query);
+                stmt.setString(1, UUID.randomUUID().toString());
+                stmt.setString(2, this.UserId);
+                stmt.setString(3, Teammate_Id);
+
+                stmt.execute();
+                stmt.close();
+                connection.close();
+            }
+        }
+    }
 
     public void ShareFileWithTeam(){}
 

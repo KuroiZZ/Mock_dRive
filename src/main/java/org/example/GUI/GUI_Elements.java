@@ -1,6 +1,7 @@
 package org.example.GUI;
 
 import com.mysql.cj.log.Log;
+import org.example.Main;
 import org.example.SessionSystem.Session;
 import org.example.User.User;
 
@@ -84,7 +85,7 @@ public class GUI_Elements
             {
                 try
                 {
-                    Session.LogIn(User_Name_Field.getText(), Password_Field.getText());
+                    Main.current_user =  Session.LogIn(User_Name_Field.getText(), Password_Field.getText());
                 }
                 catch (SQLException ex)
                 {
