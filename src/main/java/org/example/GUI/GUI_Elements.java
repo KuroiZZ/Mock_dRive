@@ -14,11 +14,11 @@ import java.sql.SQLException;
 public class GUI_Elements
 {
 
-    public static GridBagConstraints setConstraints(int gridwidth, int gridheight, int gridx, int gridy)
+    public static GridBagConstraints setConstraints(int fill,int gridwidth, int gridheight, int gridx, int gridy)
     {
         GridBagConstraints constraints = new GridBagConstraints();
 
-        constraints.fill = GridBagConstraints.NONE;
+        constraints.fill = fill;
         constraints.anchor = GridBagConstraints.CENTER;
         constraints.weightx = 0.5;
         constraints.weighty = 0.5;
@@ -42,7 +42,6 @@ public class GUI_Elements
     {
         //--
         JPanel LogInPanel = new JPanel(new GridBagLayout());
-        LogInPanel.setBackground(Color.BLUE);
         //--
 
         //--
@@ -57,7 +56,7 @@ public class GUI_Elements
         User_Name_Field.setPreferredSize(new Dimension(0, 30));
         User_Name_Panel.add(User_Name_Field);
 
-        LogInPanel.add(User_Name_Panel, setConstraints(1, 1, 0 ,0));
+        LogInPanel.add(User_Name_Panel, setConstraints(GridBagConstraints.NONE,1, 1, 0 ,0));
         //--
 
         //--
@@ -72,7 +71,7 @@ public class GUI_Elements
         Password_Field.setPreferredSize(new Dimension(0, 30));
         Password_Panel.add(Password_Field);
 
-        LogInPanel.add(Password_Panel,  setConstraints(1,1,0,1));
+        LogInPanel.add(Password_Panel,  setConstraints(GridBagConstraints.NONE,1,1,0,1));
         //--
 
         //--
@@ -86,6 +85,10 @@ public class GUI_Elements
                 try
                 {
                     Main.current_user =  Session.LogIn(User_Name_Field.getText(), Password_Field.getText());
+                    Window.getContentPane().removeAll();
+                    InitializeUserMenu();
+                    Window.revalidate();
+                    Window.repaint();
                 }
                 catch (SQLException ex)
                 {
@@ -93,7 +96,24 @@ public class GUI_Elements
                 }
             }
         });
-        LogInPanel.add(LogIn_Button, setConstraints(1,1,0,2));
+        LogInPanel.add(LogIn_Button, setConstraints(GridBagConstraints.NONE,1,1,0,2));
+        //--
+
+        //--
+        JButton Register_Button = new JButton("Register");
+        Register_Button.setPreferredSize(new Dimension(300, 30));
+        Register_Button.addActionListener(new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                Window.getContentPane().removeAll();
+                InitializeRegisterMenu();
+                Window.revalidate();
+                Window.repaint();
+            }
+        });
+        LogInPanel.add(Register_Button, setConstraints(GridBagConstraints.NONE,1,1,0,3));
         //--
 
         Window.add(LogInPanel);
@@ -104,7 +124,6 @@ public class GUI_Elements
     {
         //--
         JPanel Register_Panel = new JPanel(new GridBagLayout());
-        Register_Panel.setBackground(Color.BLUE);
         //--
 
         //--
@@ -119,7 +138,7 @@ public class GUI_Elements
         User_Name_Field.setPreferredSize(new Dimension(0, 30));
         User_Name_Panel.add(User_Name_Field);
 
-        Register_Panel.add(User_Name_Panel, setConstraints(1, 1, 0 ,0));
+        Register_Panel.add(User_Name_Panel, setConstraints(GridBagConstraints.NONE,1, 1, 0 ,0));
         //--
 
         //--
@@ -134,7 +153,7 @@ public class GUI_Elements
         First_Name_Field.setPreferredSize(new Dimension(0, 30));
         First_Name_Panel.add(First_Name_Field);
 
-        Register_Panel.add(First_Name_Panel, setConstraints(1, 1, 0 ,1));
+        Register_Panel.add(First_Name_Panel, setConstraints(GridBagConstraints.NONE,1, 1, 0 ,1));
         //--
 
         //--
@@ -149,7 +168,7 @@ public class GUI_Elements
         Last_Name_Field.setPreferredSize(new Dimension(0, 30));
         Last_Name_Panel.add(Last_Name_Field);
 
-        Register_Panel.add(Last_Name_Panel, setConstraints(1, 1, 0 ,2));
+        Register_Panel.add(Last_Name_Panel, setConstraints(GridBagConstraints.NONE,1, 1, 0 ,2));
         //--
 
 
@@ -165,13 +184,13 @@ public class GUI_Elements
         Password_Field.setPreferredSize(new Dimension(0, 30));
         Password_Panel.add(Password_Field);
 
-        Register_Panel.add(Password_Panel,  setConstraints(1,1,0,3));
+        Register_Panel.add(Password_Panel,  setConstraints(GridBagConstraints.NONE,1,1,0,3));
         //--
 
         //--
-        JButton LogIn_Button = new JButton("Register");
-        LogIn_Button.setPreferredSize(new Dimension(300, 30));
-        LogIn_Button.addActionListener(new ActionListener()
+        JButton Register_Button = new JButton("Register");
+        Register_Button.setPreferredSize(new Dimension(300, 30));
+        Register_Button.addActionListener(new ActionListener()
         {
             @Override
             public void actionPerformed(ActionEvent e)
@@ -186,10 +205,70 @@ public class GUI_Elements
                 }
             }
         });
-        Register_Panel.add(LogIn_Button, setConstraints(1,1,0,4));
+        Register_Panel.add(Register_Button, setConstraints(GridBagConstraints.NONE,1,1,0,4));
+        //--
+
+        //--
+        JButton LogIn_Button = new JButton("Log In");
+        LogIn_Button.setPreferredSize(new Dimension(300, 30));
+        LogIn_Button.addActionListener(new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                Window.getContentPane().removeAll();
+                InitializeLogInMenu();
+                Window.revalidate();
+                Window.repaint();
+            }
+        });
+        Register_Panel.add(LogIn_Button, setConstraints(GridBagConstraints.NONE,1,1,0,5));
         //--
 
         Window.add(Register_Panel);
+        Window.setVisible(true);
+    }
+
+    public static void InitializeUserMenu()
+    {
+        JPanel Content_Panel = new JPanel(new GridBagLayout());
+        //--
+        JPanel Team_Panel = new JPanel();
+        Team_Panel.setBackground(Color.BLUE);
+        //--
+
+        //--
+        JPanel File_Panel = new JPanel();
+        File_Panel.setBackground(Color.RED);
+        //--
+
+        //--
+        JPanel Profile_Panel = new JPanel();
+        Profile_Panel.setBackground(Color.GREEN);
+
+        JLabel User_Name = new JLabel(Main.current_user.getUserName());
+        User_Name.setFont(new Font(Font.SERIF, Font.BOLD, 25));
+        Profile_Panel.add(User_Name);
+
+        JButton Create_Team_Button = new JButton("Create Team");
+        Profile_Panel.add(Create_Team_Button);
+
+        JButton Select_Team_Button = new JButton("Select Team");
+        Profile_Panel.add(Select_Team_Button);
+
+        JButton Delete_Team_Button = new JButton("Delete Team");
+        Profile_Panel.add(Delete_Team_Button);
+
+        JButton Settings_Button = new JButton("Settings");
+        Profile_Panel.add(Settings_Button);
+
+        //--
+
+        Content_Panel.add(Team_Panel, setConstraints(GridBagConstraints.BOTH,1,1,0,0));
+        Content_Panel.add(File_Panel, setConstraints(GridBagConstraints.BOTH,1,1,1,0));
+        Content_Panel.add(Profile_Panel, setConstraints(GridBagConstraints.BOTH,1,1,2,0));
+
+        Window.add(Content_Panel);
         Window.setVisible(true);
     }
 
