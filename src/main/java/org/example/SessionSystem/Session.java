@@ -123,7 +123,7 @@ public class Session
         {
             if(BCrypt.checkpw(Password, rs.getString(5)))
             {
-                if (Objects.equals(rs.getString(6), "USER"))
+                if (Objects.equals(rs.getString(6), "CUSTOMER"))
                 {
                     logged_user = new User(rs.getString(1), rs.getString(2), rs.getString(3),
                             rs.getString(4), rs.getString(5));
@@ -145,6 +145,34 @@ public class Session
         stmt.close();
         connection.close();
 
+        return logged_user;
+    }
+
+
+    static public User SelectUser(String User_Name) throws SQLException
+    {
+        java.sql.Connection connection = (java.sql.Connection) DriverManager.getConnection(Connection.url, Connection.user, Connection.password);
+
+        String querySelect = "SELECT * from user WHERE User_Name = ?";
+        PreparedStatement stmt = connection.prepareStatement(querySelect);
+        stmt.setString(1, User_Name);
+        ResultSet rs = stmt.executeQuery();
+
+        User logged_user = null;
+
+        while (rs.next())
+        {
+                if (Objects.equals(rs.getString(6), "CUSTOMER"))
+                {
+                    logged_user = new User(rs.getString(1), rs.getString(2), rs.getString(3),
+                            rs.getString(4), rs.getString(5));
+                }
+                else
+                {
+                    logged_user = new Admin(rs.getString(1), rs.getString(2), rs.getString(3),
+                            rs.getString(4), rs.getString(5));
+                }
+        }
         return logged_user;
     }
 
