@@ -10,6 +10,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Objects;
 
 public class GUI_Elements
 {
@@ -197,7 +199,17 @@ public class GUI_Elements
             {
                 try
                 {
-                    Session.Register(User_Name_Field.getText(), First_Name_Field.getText(), Last_Name_Field.getText(),Password_Field.getText());
+                    if (!Objects.equals(User_Name_Field.getText(), "") && !Objects.equals(First_Name_Field.getText(), "") &&
+                        !Objects.equals(Last_Name_Field.getText(), "") && !Objects.equals(Password_Field.getText(), ""))
+                    {
+                        Session.Register(User_Name_Field.getText(), First_Name_Field.getText(),
+                                         Last_Name_Field.getText(), Password_Field.getText());
+                    }
+                    else
+                    {
+                        System.out.println("Herhangi biri boş kardeşim");
+                    }
+
                 }
                 catch (SQLException ex)
                 {
@@ -229,40 +241,17 @@ public class GUI_Elements
         Window.setVisible(true);
     }
 
+    static JPanel Content_Panel = new JPanel(new GridBagLayout());
     public static void InitializeUserMenu()
     {
-        JPanel Content_Panel = new JPanel(new GridBagLayout());
-        //--
+        InitializeProfilePanel();
+        InitializeCreateTeamPanel();
+
         JPanel Team_Panel = new JPanel();
         Team_Panel.setBackground(Color.BLUE);
-        //--
 
-        //--
         JPanel File_Panel = new JPanel();
         File_Panel.setBackground(Color.RED);
-        //--
-
-        //--
-        JPanel Profile_Panel = new JPanel();
-        Profile_Panel.setBackground(Color.GREEN);
-
-        JLabel User_Name = new JLabel(Main.current_user.getUserName());
-        User_Name.setFont(new Font(Font.SERIF, Font.BOLD, 25));
-        Profile_Panel.add(User_Name);
-
-        JButton Create_Team_Button = new JButton("Create Team");
-        Profile_Panel.add(Create_Team_Button);
-
-        JButton Select_Team_Button = new JButton("Select Team");
-        Profile_Panel.add(Select_Team_Button);
-
-        JButton Delete_Team_Button = new JButton("Delete Team");
-        Profile_Panel.add(Delete_Team_Button);
-
-        JButton Settings_Button = new JButton("Settings");
-        Profile_Panel.add(Settings_Button);
-
-        //--
 
         Content_Panel.add(Team_Panel, setConstraints(GridBagConstraints.BOTH,1,1,0,0));
         Content_Panel.add(File_Panel, setConstraints(GridBagConstraints.BOTH,1,1,1,0));
@@ -270,6 +259,138 @@ public class GUI_Elements
 
         Window.add(Content_Panel);
         Window.setVisible(true);
+    }
+
+    static JPanel Profile_Panel = new JPanel();
+    public static void InitializeProfilePanel()
+    {
+        Profile_Panel.setBackground(Color.GREEN);
+
+        JLabel User_Name = new JLabel(Main.current_user.getUserName());
+        User_Name.setFont(new Font(Font.SERIF, Font.BOLD, 25));
+        Profile_Panel.add(User_Name);
+
+        JButton Create_Team_Button = new JButton("Create Team");
+        Create_Team_Button.addActionListener(new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                Content_Panel.remove(Profile_Panel);
+                Content_Panel.add(Create_Team_Panel);
+                Window.revalidate();
+                Window.repaint();
+            }
+        });
+        Profile_Panel.add(Create_Team_Button);
+
+        JButton Select_Team_Button = new JButton("Select Team");
+        Select_Team_Button.addActionListener(new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                Content_Panel.remove(Profile_Panel);
+                InitializeSelectTeamPanel();
+                Content_Panel.add(Select_Team_Panel);
+                Window.revalidate();
+                Window.repaint();
+            }
+        });
+        Profile_Panel.add(Select_Team_Button);
+
+        JButton Settings_Button = new JButton("Settings");
+        Profile_Panel.add(Settings_Button);
+    }
+
+    static JPanel Create_Team_Panel = new JPanel();
+    public static void InitializeCreateTeamPanel()
+    {
+        Create_Team_Panel.setBackground(Color.GREEN);
+
+        JTextField Team_Name_Field = new JTextField(15);
+        Team_Name_Field.setPreferredSize(new Dimension(0, 30));
+        Create_Team_Panel.add(Team_Name_Field);
+
+        JTextField Team_Mate_Field = new JTextField(15);
+        Team_Mate_Field.setPreferredSize(new Dimension(0, 30));
+        Create_Team_Panel.add(Team_Mate_Field);
+
+        JButton Create_Button = new JButton("Create");
+        Create_Button.addActionListener(new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                if (!Objects.equals(Team_Name_Field.getText(), "") && !Objects.equals(Team_Mate_Field.getText(), ""))
+                {
+                    try
+                    {
+                        Main.current_user.CreateTeam(Team_Name_Field.getText(), Team_Mate_Field.getText());
+                    }
+                    catch (SQLException ex)
+                    {
+                        throw new RuntimeException(ex);
+                    }
+                }
+                else
+                {
+                    System.out.println("Boş");
+                }
+
+            }
+        });
+        Create_Team_Panel.add(Create_Button);
+
+        JButton Return_Profile_Button = new JButton("Return Profile");
+        Return_Profile_Button.addActionListener(new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                Content_Panel.remove(Create_Team_Panel);
+                Content_Panel.add(Profile_Panel);
+                Window.revalidate();
+                Window.repaint();
+            }
+        });
+        Create_Team_Panel.add(Return_Profile_Button);
+
+    }
+
+    static JPanel Select_Team_Panel = new JPanel();
+    public static void InitializeSelectTeamPanel()
+    {
+        Select_Team_Panel.removeAll();
+        ArrayList<JButton> Teams;
+        try
+        {
+            Teams = Main.current_user.GetAllTeams();
+        }
+        catch (SQLException e)
+        {
+            throw new RuntimeException(e);
+        }
+
+        Select_Team_Panel.setBackground(Color.GREEN);
+        for (JButton team : Teams)
+        {
+            Select_Team_Panel.add(team);
+        }
+
+        JButton Return_Profile_Button = new JButton("Return Profile");
+        Return_Profile_Button.addActionListener(new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                Content_Panel.remove(Select_Team_Panel);
+                Content_Panel.add(Profile_Panel);
+                Window.revalidate();
+                Window.repaint();
+            }
+        });
+        Select_Team_Panel.add(Return_Profile_Button);
     }
 
 }
