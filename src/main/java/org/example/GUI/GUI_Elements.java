@@ -3,6 +3,7 @@ package org.example.GUI;
 import com.mysql.cj.log.Log;
 import org.example.Main;
 import org.example.SessionSystem.Session;
+import org.example.User.Team;
 import org.example.User.User;
 
 import javax.swing.*;
@@ -241,19 +242,18 @@ public class GUI_Elements
         Window.setVisible(true);
     }
 
-    static JPanel Content_Panel = new JPanel(new GridBagLayout());
+    static public JPanel Content_Panel = new JPanel(new GridBagLayout());
     public static void InitializeUserMenu()
     {
         InitializeProfilePanel();
         InitializeCreateTeamPanel();
+        InitializeRasputinPanel();
 
-        JPanel Team_Panel = new JPanel();
-        Team_Panel.setBackground(Color.BLUE);
 
         JPanel File_Panel = new JPanel();
         File_Panel.setBackground(Color.RED);
 
-        Content_Panel.add(Team_Panel, setConstraints(GridBagConstraints.BOTH,1,1,0,0));
+        Content_Panel.add(Rasputin_Panel, setConstraints(GridBagConstraints.BOTH,1,1,0,0));
         Content_Panel.add(File_Panel, setConstraints(GridBagConstraints.BOTH,1,1,1,0));
         Content_Panel.add(Profile_Panel, setConstraints(GridBagConstraints.BOTH,1,1,2,0));
 
@@ -261,7 +261,34 @@ public class GUI_Elements
         Window.setVisible(true);
     }
 
-    static JPanel Profile_Panel = new JPanel();
+    static public JPanel Rasputin_Panel = new JPanel();
+    public static void InitializeRasputinPanel()
+    {
+        Rasputin_Panel.setBackground(Color.BLUE);
+    }
+
+    static public JPanel Team_Panel = new JPanel();
+    public static void InitializeTeamPanel()
+    {
+        Profile_Panel.setBackground(Color.BLUE);
+
+        JLabel Team_Name = new JLabel(Main.current_team.getName());
+        Team_Panel.add(Team_Name);
+
+        JLabel Team_Leader = new JLabel("Team Leader: " + Main.current_team.getTeam_Leader().getUserName());
+        Team_Panel.add(Team_Leader);
+
+        for (User team_member : Main.current_team.getTeam_Members())
+        {
+            JLabel Team_Member = new JLabel("Team Member: " + team_member.getUserName());
+            Team_Panel.add(Team_Member);
+        }
+
+        JButton Add_Team_Member_Button = new JButton("Add Team Mate");
+        Team_Panel.add(Add_Team_Member_Button);
+    }
+
+    static public JPanel Profile_Panel = new JPanel();
     public static void InitializeProfilePanel()
     {
         Profile_Panel.setBackground(Color.GREEN);
@@ -303,7 +330,7 @@ public class GUI_Elements
         Profile_Panel.add(Settings_Button);
     }
 
-    static JPanel Create_Team_Panel = new JPanel();
+    static public JPanel Create_Team_Panel = new JPanel();
     public static void InitializeCreateTeamPanel()
     {
         Create_Team_Panel.setBackground(Color.GREEN);
@@ -358,14 +385,14 @@ public class GUI_Elements
 
     }
 
-    static JPanel Select_Team_Panel = new JPanel();
+    static public JPanel Select_Team_Panel = new JPanel();
     public static void InitializeSelectTeamPanel()
     {
         Select_Team_Panel.removeAll();
         ArrayList<JButton> Teams;
         try
         {
-            Teams = Main.current_user.GetAllTeams();
+            Teams = Session.GetAllTeams(Main.current_user.getUserName());
         }
         catch (SQLException e)
         {
