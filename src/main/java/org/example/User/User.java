@@ -5,17 +5,14 @@ import org.example.GUI.GUI_Elements;
 import org.example.Main;
 import org.example.SessionSystem.Session;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Objects;
 import java.util.UUID;
+
+import static org.example.GUI.GUI_Elements.InitializeProfilePanel;
 
 public class User
 {
@@ -36,9 +33,61 @@ public class User
         Role = org.example.User.Role.CUSTOMER;
     }
 
-    public void ChangeUserName(){}
+    public void ChangeUserName(String Previous_User_Name, String New_User_Name)
+    {
+        if (Objects.equals(this.UserName, Previous_User_Name))
+        {
+            java.sql.Connection connection = null;
+            try
+            {
+                connection = (java.sql.Connection) DriverManager.getConnection(Connection.url, Connection.user, Connection.password);
 
-    public void SendChangePasswordRequest(){}
+                String query = "UPDATE user SET User_Name = ? WHERE User_Name = ?";
+
+                PreparedStatement stmt = connection.prepareStatement(query);
+
+                stmt.setString(1, New_User_Name);
+                stmt.setString(2, Previous_User_Name);
+
+                stmt.execute();
+
+                stmt.close();
+                connection.close();
+                Main.current_user = Session.SelectUser(New_User_Name);
+                GUI_Elements.Profile_Panel.removeAll();
+                InitializeProfilePanel();
+            }
+            catch (SQLException ex)
+            {
+                throw new RuntimeException(ex);
+            }
+        }
+    }
+
+    public void SendChangePasswordRequest()
+    {
+        try
+        {
+            if(!Session.PasswordRequestAlreadyExist(this.UserId))
+            {
+                java.sql.Connection connection = (java.sql.Connection) DriverManager.getConnection(Connection.url, Connection.user, Connection.password);
+
+                String query = "INSERT INTO password_request (Requested_User_Id, Confirmed) VALUES(?,?)";
+
+                PreparedStatement stmt = connection.prepareStatement(query);
+                stmt.setString(1, this.UserId);
+                stmt.setBoolean(2, false);
+
+                stmt.execute();
+                stmt.close();
+                connection.close();
+            }
+        }
+        catch (SQLException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
 
     public void UploadFile(){}
 
