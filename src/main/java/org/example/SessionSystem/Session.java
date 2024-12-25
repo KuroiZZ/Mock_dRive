@@ -126,6 +126,53 @@ public class Session
         return false;
     }
 
+    static public boolean PasswordRequestAlreadyExist(String User_Id) throws SQLException {
+        java.sql.Connection connection = (java.sql.Connection) DriverManager.getConnection(Connection.url, Connection.user, Connection.password);
+
+        String querySelect = "SELECT COUNT(Requested_User_Id) from password_request WHERE Requested_User_Id = ?";
+
+        PreparedStatement stmt = connection.prepareStatement(querySelect);
+
+        stmt.setString(1, User_Id);
+
+        ResultSet rs = stmt.executeQuery();
+
+        while (rs.next())
+        {
+            if(rs.getInt(1) > 0)
+            {
+                stmt.close();
+                connection.close();
+                return true;
+            }
+        }
+        stmt.close();
+        connection.close();
+        return false;
+    }
+
+    static public boolean PasswordRequestAccepted(String User_Id) throws SQLException
+    {
+        if (PasswordRequestAlreadyExist(User_Id))
+        {
+            java.sql.Connection connection = (java.sql.Connection) DriverManager.getConnection(Connection.url, Connection.user, Connection.password);
+
+            String querySelect = "SELECT Confirmed from password_request WHERE Requested_User_Id = ?";
+
+            PreparedStatement stmt = connection.prepareStatement(querySelect);
+
+            stmt.setString(1, User_Id);
+
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next())
+            {
+                return rs.getBoolean(1);
+            }
+        }
+        return false;
+    }
+
     static public String  EncryptPassword(String Password)
     {
         String salt = BCrypt.gensalt();
