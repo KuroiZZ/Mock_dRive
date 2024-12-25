@@ -88,10 +88,13 @@ public class GUI_Elements
                 try
                 {
                     Main.current_user =  Session.LogIn(User_Name_Field.getText(), Password_Field.getText());
-                    Window.getContentPane().removeAll();
-                    InitializeUserMenu();
-                    Window.revalidate();
-                    Window.repaint();
+                    if (Main.current_user != null)
+                    {
+                        Window.getContentPane().removeAll();
+                        InitializeUserMenu();
+                        Window.revalidate();
+                        Window.repaint();
+                    }
                 }
                 catch (SQLException ex)
                 {
@@ -270,7 +273,7 @@ public class GUI_Elements
     static public JPanel Team_Panel = new JPanel();
     public static void InitializeTeamPanel()
     {
-        Profile_Panel.setBackground(Color.BLUE);
+        Team_Panel.setBackground(Color.BLUE);
 
         JLabel Team_Name = new JLabel(Main.current_team.getName());
         Team_Panel.add(Team_Name);
@@ -312,7 +315,7 @@ public class GUI_Elements
             public void actionPerformed(ActionEvent e)
             {
                 Content_Panel.remove(Profile_Panel);
-                Content_Panel.add(Create_Team_Panel);
+                Content_Panel.add(Create_Team_Panel, setConstraints(GridBagConstraints.BOTH,1,1,2,0));
                 Window.revalidate();
                 Window.repaint();
             }
@@ -327,7 +330,7 @@ public class GUI_Elements
             {
                 Content_Panel.remove(Profile_Panel);
                 InitializeSelectTeamPanel();
-                Content_Panel.add(Select_Team_Panel);
+                Content_Panel.add(Select_Team_Panel, setConstraints(GridBagConstraints.BOTH,1,1,2,0));
                 Window.revalidate();
                 Window.repaint();
             }
@@ -377,7 +380,7 @@ public class GUI_Elements
             public void actionPerformed(ActionEvent e)
             {
                 Content_Panel.remove(Create_Team_Panel);
-                Content_Panel.add(Profile_Panel);
+                Content_Panel.add(Profile_Panel, setConstraints(GridBagConstraints.BOTH,1,1,2,0));
                 Window.revalidate();
                 Window.repaint();
             }
@@ -413,7 +416,7 @@ public class GUI_Elements
             public void actionPerformed(ActionEvent e)
             {
                 Content_Panel.remove(Select_Team_Panel);
-                Content_Panel.add(Profile_Panel);
+                Content_Panel.add(Profile_Panel, setConstraints(GridBagConstraints.BOTH,1,1,2,0));
                 Window.revalidate();
                 Window.repaint();
             }

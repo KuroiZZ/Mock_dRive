@@ -43,7 +43,7 @@ public class User
     public void UploadFile(){}
 
     public void CreateTeam(String TeamName, String TeammateName)
-     {
+    {
         try
         {
             java.sql.Connection connection = (java.sql.Connection) DriverManager.getConnection(Connection.url, Connection.user, Connection.password);
@@ -83,6 +83,10 @@ public class User
                     stmt.close();
                     connection.close();
                 }
+            }
+            else
+            {
+                System.out.println("Invalid user name");
             }
         }
         catch (SQLException e)

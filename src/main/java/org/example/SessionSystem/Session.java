@@ -265,6 +265,7 @@ public class Session
                         throw new RuntimeException(ex);
                     }
                     GUI_Elements.Content_Panel.remove(GUI_Elements.Rasputin_Panel);
+                    GUI_Elements.Team_Panel.removeAll();
                     GUI_Elements.InitializeTeamPanel();
                     GUI_Elements.Content_Panel.add(GUI_Elements.Team_Panel, GUI_Elements.setConstraints(GridBagConstraints.BOTH,1,1,0,0));
                     GUI_Elements.Window.revalidate();
@@ -276,7 +277,8 @@ public class Session
         return Teams;
     }
 
-    static public Team SelectTeam(String Team_Id) throws SQLException {
+    static public Team SelectTeam(String Team_Id) throws SQLException
+    {
         java.sql.Connection connection = (java.sql.Connection) DriverManager.getConnection(Connection.url, Connection.user, Connection.password);
 
         ArrayList<User> user_list = new ArrayList<>();
