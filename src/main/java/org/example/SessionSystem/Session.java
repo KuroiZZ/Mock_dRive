@@ -99,6 +99,33 @@ public class Session
         return false;
     }
 
+    static public boolean UserAlreadyInTeam(String User_Name, String Team_Id) throws SQLException
+    {
+        java.sql.Connection connection = (java.sql.Connection) DriverManager.getConnection(Connection.url, Connection.user, Connection.password);
+
+        String querySelect = "SELECT COUNT(Team_Id) from team_member WHERE Team_Id = ? and Team_Member = ?";
+
+        PreparedStatement stmt = connection.prepareStatement(querySelect);
+
+        stmt.setString(1, Team_Id);
+        stmt.setString(2, User_Name);
+
+        ResultSet rs = stmt.executeQuery();
+
+        while (rs.next())
+        {
+            if(rs.getInt(1) > 0)
+            {
+                stmt.close();
+                connection.close();
+                return true;
+            }
+        }
+        stmt.close();
+        connection.close();
+        return false;
+    }
+
     static public String  EncryptPassword(String Password)
     {
         String salt = BCrypt.gensalt();

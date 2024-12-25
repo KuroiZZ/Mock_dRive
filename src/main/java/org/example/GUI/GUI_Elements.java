@@ -285,6 +285,14 @@ public class GUI_Elements
         }
 
         JButton Add_Team_Member_Button = new JButton("Add Team Mate");
+        Add_Team_Member_Button.addActionListener(new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                InitializeInputFrame();
+            }
+        });
         Team_Panel.add(Add_Team_Member_Button);
     }
 
@@ -351,14 +359,7 @@ public class GUI_Elements
             {
                 if (!Objects.equals(Team_Name_Field.getText(), "") && !Objects.equals(Team_Mate_Field.getText(), ""))
                 {
-                    try
-                    {
-                        Main.current_user.CreateTeam(Team_Name_Field.getText(), Team_Mate_Field.getText());
-                    }
-                    catch (SQLException ex)
-                    {
-                        throw new RuntimeException(ex);
-                    }
+                    Main.current_user.CreateTeam(Team_Name_Field.getText(), Team_Mate_Field.getText());
                 }
                 else
                 {
@@ -418,6 +419,41 @@ public class GUI_Elements
             }
         });
         Select_Team_Panel.add(Return_Profile_Button);
+    }
+
+    public static JFrame InputFrame;
+    public static void InitializeInputFrame()
+    {
+        InputFrame = new JFrame();
+        InputFrame.setSize(new Dimension(300, 100));
+        InputFrame.setLayout(new FlowLayout());
+
+        JTextField input_field = new JTextField(15);
+        JButton validate_button = new JButton("Create");
+
+        validate_button.addActionListener(new ActionListener()
+        {
+
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                if (!input_field.getText().isEmpty())
+                {
+                    Main.current_user.AddTeamMate(Main.current_team.getId(), input_field.getText());
+                    InputFrame.dispose();
+                    Window.revalidate();
+                    Window.repaint();
+                }
+                else
+                {
+                    System.out.println("A");
+                }
+            }
+        });
+        InputFrame.add(input_field);
+        InputFrame.add(validate_button);
+        InputFrame.setLocationRelativeTo(GUI_Elements.Window);
+        InputFrame.setVisible(true);
     }
 
 }

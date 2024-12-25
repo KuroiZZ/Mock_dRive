@@ -42,53 +42,61 @@ public class User
 
     public void UploadFile(){}
 
-    public void CreateTeam(String TeamName, String TeammateName) throws SQLException
-    {
-        java.sql.Connection connection = (java.sql.Connection) DriverManager.getConnection(Connection.url, Connection.user, Connection.password);
-
-        if (Session.UserNameAlreadyExist(TeammateName) && !Objects.equals(this.UserName, TeammateName))
+    public void CreateTeam(String TeamName, String TeammateName)
+     {
+        try
         {
-            String querySelect = "SELECT User_Id from user WHERE User_Name = ?";
-            PreparedStatement stmt = connection.prepareStatement(querySelect);
-            stmt.setString(1, TeammateName);
-            ResultSet rs = stmt.executeQuery();
-            stmt.clearParameters();
+            java.sql.Connection connection = (java.sql.Connection) DriverManager.getConnection(Connection.url, Connection.user, Connection.password);
 
-            String Teammate_Id = null;
-            if (rs.next())
+            if (Session.UserNameAlreadyExist(TeammateName) && !Objects.equals(this.UserName, TeammateName))
             {
-                Teammate_Id = rs.getString(1);
+                String querySelect = "SELECT User_Id from user WHERE User_Name = ?";
+                PreparedStatement stmt = connection.prepareStatement(querySelect);
+                stmt.setString(1, TeammateName);
+                ResultSet rs = stmt.executeQuery();
+                stmt.clearParameters();
+
+                String Teammate_Id = null;
+                if (rs.next())
+                {
+                    Teammate_Id = rs.getString(1);
+                }
+
+                if (Teammate_Id != null)
+                {
+                    String query = "INSERT INTO team (Team_Id, Team_Name, Team_Leader) VALUES(?, ?, ?);";
+                    String Team_Id = UUID.randomUUID().toString();
+
+                    stmt = connection.prepareStatement(query);
+                    stmt.setString(1, Team_Id);
+                    stmt.setString(2, TeamName);
+                    stmt.setString(3, this.UserName);
+                    stmt.execute();
+
+                    query = "INSERT INTO team_member (Team_Id, Team_Member) VALUES(?, ?);";
+
+                    stmt = connection.prepareStatement(query);
+                    stmt.setString(1, Team_Id);
+                    stmt.setString(2, TeammateName);
+
+                    stmt.execute();
+                    stmt.close();
+                    connection.close();
+                }
             }
-
-            if (Teammate_Id != null)
-            {
-                String query = "INSERT INTO team (Team_Id, Team_Name, Team_Leader) VALUES(?, ?, ?);";
-                String Team_Id = UUID.randomUUID().toString();
-
-                stmt = connection.prepareStatement(query);
-                stmt.setString(1, Team_Id);
-                stmt.setString(2, TeamName);
-                stmt.setString(3, this.UserName);
-                stmt.execute();
-
-                query = "INSERT INTO team_member (Team_Id, Team_Member) VALUES(?, ?);";
-
-                stmt = connection.prepareStatement(query);
-                stmt.setString(1, Team_Id);
-                stmt.setString(2, TeammateName);
-
-                stmt.execute();
-                stmt.close();
-                connection.close();
-            }
+        }
+        catch (SQLException e)
+        {
+            throw new RuntimeException(e);
         }
     }
 
-    static public void AddTeamMate(String TeamId,String TeamMate)
+    public void AddTeamMate(String TeamId,String TeamMate)
     {
         try
         {
-            if (Session.UserNameAlreadyExist(TeamMate) && Session.TeamAlreadyExist(TeamId))
+            if (Session.UserNameAlreadyExist(TeamMate) && Session.TeamAlreadyExist(TeamId) &&
+                    !Objects.equals(this.UserName, TeamMate) && !Session.UserAlreadyInTeam(TeamMate, TeamId))
             {
                 java.sql.Connection connection = (java.sql.Connection) DriverManager.getConnection(Connection.url, Connection.user, Connection.password);
 
@@ -138,7 +146,8 @@ public class User
         return Password;
     }
 
-    public String getRole() {
+    public String getRole()
+    {
         return Role.toString();
     }
 }
