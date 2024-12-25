@@ -1,15 +1,17 @@
 package org.example.GUI;
 
-import com.mysql.cj.log.Log;
+import org.example.Connection;
 import org.example.Main;
 import org.example.SessionSystem.Session;
-import org.example.User.Team;
 import org.example.User.User;
+import org.mindrot.jbcrypt.BCrypt;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Objects;
@@ -90,10 +92,21 @@ public class GUI_Elements
                     Main.current_user =  Session.LogIn(User_Name_Field.getText(), Password_Field.getText());
                     if (Main.current_user != null)
                     {
-                        Window.getContentPane().removeAll();
-                        InitializeUserMenu();
-                        Window.revalidate();
-                        Window.repaint();
+                        if (Session.PasswordRequestAccepted(Main.current_user.getUserId()))
+                        {
+                            Window.getContentPane().removeAll();
+                            InitializeChangePasswordPanel();
+                            Window.add(Change_Password_Panel);
+                            Window.revalidate();
+                            Window.repaint();
+                        }
+                        else
+                        {
+                            Window.getContentPane().removeAll();
+                            InitializeUserMenu();
+                            Window.revalidate();
+                            Window.repaint();
+                        }
                     }
                 }
                 catch (SQLException ex)
@@ -251,7 +264,8 @@ public class GUI_Elements
         InitializeProfilePanel();
         InitializeCreateTeamPanel();
         InitializeRasputinPanel();
-
+        InitializeSettingsPanel();
+        InitializeChangeUserNamePanel();
 
         JPanel File_Panel = new JPanel();
         File_Panel.setBackground(Color.RED);
@@ -268,6 +282,7 @@ public class GUI_Elements
     public static void InitializeRasputinPanel()
     {
         Rasputin_Panel.setBackground(Color.BLUE);
+
     }
 
     static public JPanel Team_Panel = new JPanel();
@@ -338,6 +353,17 @@ public class GUI_Elements
         Profile_Panel.add(Select_Team_Button);
 
         JButton Settings_Button = new JButton("Settings");
+        Settings_Button.addActionListener(new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                Content_Panel.remove(Profile_Panel);
+                Content_Panel.add(Settings_Panel, setConstraints(GridBagConstraints.BOTH,1,1,2,0));
+                Window.revalidate();
+                Window.repaint();
+            }
+        });
         Profile_Panel.add(Settings_Button);
     }
 
@@ -424,7 +450,154 @@ public class GUI_Elements
         Select_Team_Panel.add(Return_Profile_Button);
     }
 
-    public static JFrame InputFrame;
+    static public JPanel Settings_Panel = new JPanel();
+    public static void InitializeSettingsPanel()
+    {
+        Settings_Panel.setBackground(Color.GREEN);
+
+        JButton Change_User_Name_Button = new JButton("Change User Name");
+        Change_User_Name_Button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                Content_Panel.remove(Settings_Panel);
+                Content_Panel.add(Change_User_Name_Panel, setConstraints(GridBagConstraints.BOTH,1,1,2,0));
+                Window.revalidate();
+                Window.repaint();
+            }
+        });
+        Settings_Panel.add(Change_User_Name_Button);
+
+        JButton Change_Password_Button = new JButton("Change Password");
+        Change_Password_Button.addActionListener(new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                Main.current_user.SendChangePasswordRequest();
+            }
+        });
+        Settings_Panel.add(Change_Password_Button);
+
+        JButton Return_Profile_Button = new JButton("Return Profile");
+        Return_Profile_Button.addActionListener(new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                Content_Panel.remove(Settings_Panel);
+                Content_Panel.add(Profile_Panel, setConstraints(GridBagConstraints.BOTH,1,1,2,0));
+                Window.revalidate();
+                Window.repaint();
+            }
+        });
+        Settings_Panel.add(Return_Profile_Button);
+    }
+
+    static public JPanel Change_User_Name_Panel = new JPanel();
+    public static void InitializeChangeUserNamePanel()
+    {
+        Change_User_Name_Panel.setBackground(Color.GREEN);
+
+        JTextField Previous_User_Name_Field = new JTextField(15);
+        Change_User_Name_Panel.add(Previous_User_Name_Field);
+
+        JTextField New_User_Name_Field = new JTextField(15);
+        Change_User_Name_Panel.add(New_User_Name_Field);
+
+        JButton Submit_button = new JButton("Submit");
+        Submit_button.addActionListener(new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                if(!Objects.equals(Previous_User_Name_Field.getText(), "") && !Objects.equals(New_User_Name_Field.getText(), ""))
+                {
+                    Main.current_user.ChangeUserName(Previous_User_Name_Field.getText(), New_User_Name_Field.getText());
+                }
+            }
+        });
+        Change_User_Name_Panel.add(Submit_button);
+
+        JButton Return_Profile_Button = new JButton("Return Profile");
+        Return_Profile_Button.addActionListener(new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                Content_Panel.remove(Change_User_Name_Panel);
+                Content_Panel.add(Profile_Panel, setConstraints(GridBagConstraints.BOTH,1,1,2,0));
+                Window.revalidate();
+                Window.repaint();
+            }
+        });
+        Change_User_Name_Panel.add(Return_Profile_Button);
+    }
+
+    static public JPanel Change_Password_Panel = new JPanel();
+    public static void InitializeChangePasswordPanel()
+    {
+        Change_Password_Panel.setBackground(Color.GREEN);
+
+        JTextField Previous_Password_Field = new JTextField(15);
+        Change_Password_Panel.add(Previous_Password_Field);
+
+        JTextField New_Password_Field = new JTextField(15);
+        Change_Password_Panel.add(New_Password_Field);
+
+        JButton Submit_button = new JButton("Submit");
+        Submit_button.addActionListener(new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                if(!Objects.equals(Previous_Password_Field.getText(), "") && !Objects.equals(New_Password_Field.getText(), ""))
+                {
+                    if (BCrypt.checkpw(Previous_Password_Field.getText(), Main.current_user.getPassword()))
+                    {
+                        java.sql.Connection connection = null;
+                        try
+                        {
+                            connection = (java.sql.Connection) DriverManager.getConnection(Connection.url, Connection.user, Connection.password);
+
+                            String query = "UPDATE user SET Password = ? WHERE Password = ?";
+
+                            PreparedStatement stmt = connection.prepareStatement(query);
+
+                            stmt.setString(1, Session.EncryptPassword(New_Password_Field.getText()));
+                            stmt.setString(2, Main.current_user.getPassword());
+
+                            stmt.execute();
+
+                            query = "DELETE FROM password_request WHERE Requested_User_Id = ?";
+                            stmt = connection.prepareStatement(query);
+
+                            stmt.setString(1, Main.current_user.getUserId());
+
+                            stmt.execute();
+
+                            stmt.close();
+                            connection.close();
+
+                            Window.getContentPane().removeAll();
+                            InitializeUserMenu();
+                            Window.revalidate();
+                            Window.repaint();
+
+                        }
+                        catch (SQLException ex)
+                        {
+                            throw new RuntimeException(ex);
+                        }
+
+                    }
+                }
+            }
+        });
+        Change_Password_Panel.add(Submit_button);
+    }
+
+    static public  JFrame InputFrame;
     public static void InitializeInputFrame()
     {
         InputFrame = new JFrame();
