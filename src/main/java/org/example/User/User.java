@@ -1,10 +1,12 @@
 package org.example.User;
 
 import org.example.Connection;
+import org.example.GUI.GUI_Elements;
 import org.example.Main;
 import org.example.SessionSystem.Session;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.DriverManager;
@@ -53,7 +55,7 @@ public class User
             stmt.clearParameters();
 
             String Teammate_Id = null;
-            while (rs.next())
+            if (rs.next())
             {
                 Teammate_Id = rs.getString(1);
             }
@@ -82,61 +84,31 @@ public class User
         }
     }
 
-    public ArrayList<JButton> GetAllTeams() throws SQLException
+    static public void AddTeamMate(String TeamId,String TeamMate)
     {
-        java.sql.Connection connection = (java.sql.Connection) DriverManager.getConnection(Connection.url, Connection.user, Connection.password);
-
-        ArrayList<JButton> Teams = new ArrayList<JButton>();
-
-        String query = "SELECT Team_Name, Team_Id FROM team WHERE Team_Leader = ?";
-        PreparedStatement stmt = connection.prepareStatement(query);
-        stmt.setString(1, this.UserName);
-        ResultSet rs = stmt.executeQuery();
-        while (rs.next())
+        try
         {
-            JButton new_button = new JButton(rs.getString(1));
-            String Team_Id = rs.getString(2);
-            new_button.addActionListener(new ActionListener()
+            if (Session.UserNameAlreadyExist(TeamMate) && Session.TeamAlreadyExist(TeamId))
             {
-                @Override
-                public void actionPerformed(ActionEvent e)
-                {
+                java.sql.Connection connection = (java.sql.Connection) DriverManager.getConnection(Connection.url, Connection.user, Connection.password);
 
-                    try
-                    {
-                        ArrayList<User> user_list = new ArrayList<>();
+                String query = "INSERT INTO team_member (Team_Id, Team_Member) VALUES(?, ?);";
 
-                        String query1 = "SELECT * FROM team WHERE Team_Id = ?";
-                        PreparedStatement stmt1 = connection.prepareStatement(query1);
-                        stmt1.setString(1, Team_Id);
-                        ResultSet rs1 = stmt1.executeQuery();
-                        if (rs1.next())
-                        {
-                            System.out.println(rs1.getString(3));
-                            String query2 = "SELECT Team_Member FROM team_member WHERE Team_Id = ?";
-                            PreparedStatement stmt2 = connection.prepareStatement(query2);
-                            stmt2.setString(1, Team_Id);
-                            ResultSet rs2 = stmt2.executeQuery();
-                            while (rs2.next())
-                            {
-                                User new_user = Session.SelectUser(rs2.getString(1));
-                                user_list.add(new_user);
-                            }
-                            Main.current_team = new Team(rs1.getString(1), rs1.getString(2), Session.SelectUser(rs1.getString(3)), user_list);
-                            System.out.println(Main.current_team);
-                        }
+                PreparedStatement stmt = connection.prepareStatement(query);
 
+                stmt = connection.prepareStatement(query);
+                stmt.setString(1, TeamId);
+                stmt.setString(2, TeamMate);
 
-                    }
-                    catch (SQLException ex) {
-                        throw new RuntimeException(ex);
-                    }
-
-                }
-            });
-            Teams.add(new_button);
+                stmt.execute();
+                stmt.close();
+                connection.close();
+            }
         }
-        return Teams;
+        catch (SQLException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
     public void ShareFileWithTeam(){}
