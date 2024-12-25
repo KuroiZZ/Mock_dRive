@@ -1,14 +1,23 @@
 package org.example.SessionSystem;
 
 import org.example.Connection;
+import org.example.GUI.GUI_Elements;
+import org.example.Main;
 import org.example.User.Admin;
 import org.example.User.Role;
+import org.example.User.Team;
 import org.example.User.User;
 
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.Objects;
 import java.util.UUID;
 import org.mindrot.jbcrypt.BCrypt;
+
+import javax.swing.*;
 
 public class Session
 {
@@ -47,6 +56,32 @@ public class Session
         PreparedStatement stmt = connection.prepareStatement(querySelect);
 
         stmt.setString(1, User_Name);
+
+        ResultSet rs = stmt.executeQuery();
+
+        while (rs.next())
+        {
+            if(rs.getInt(1) > 0)
+            {
+                stmt.close();
+                connection.close();
+                return true;
+            }
+        }
+        stmt.close();
+        connection.close();
+        return false;
+    }
+
+    static public boolean TeamAlreadyExist(String Team_Id) throws SQLException
+    {
+        java.sql.Connection connection = (java.sql.Connection) DriverManager.getConnection(Connection.url, Connection.user, Connection.password);
+
+        String querySelect = "SELECT COUNT(Team_Id) from team WHERE Team_Id = ?";
+
+        PreparedStatement stmt = connection.prepareStatement(querySelect);
+
+        stmt.setString(1, Team_Id);
 
         ResultSet rs = stmt.executeQuery();
 
@@ -148,7 +183,6 @@ public class Session
         return logged_user;
     }
 
-
     static public User SelectUser(String User_Name) throws SQLException
     {
         java.sql.Connection connection = (java.sql.Connection) DriverManager.getConnection(Connection.url, Connection.user, Connection.password);
@@ -174,6 +208,70 @@ public class Session
                 }
         }
         return logged_user;
+    }
+
+    static public ArrayList<JButton> GetAllTeams(String Team_Leader) throws SQLException
+    {
+        java.sql.Connection connection = (java.sql.Connection) DriverManager.getConnection(Connection.url, Connection.user, Connection.password);
+
+        ArrayList<JButton> Teams = new ArrayList<JButton>();
+
+        String query = "SELECT Team_Name, Team_Id FROM team WHERE Team_Leader = ?";
+        PreparedStatement stmt = connection.prepareStatement(query);
+        stmt.setString(1, Team_Leader);
+        ResultSet rs = stmt.executeQuery();
+        while (rs.next())
+        {
+            JButton new_button = new JButton(rs.getString(1));
+            String Team_Id = rs.getString(2);
+            new_button.addActionListener(new ActionListener()
+            {
+                @Override
+                public void actionPerformed(ActionEvent e)
+                {
+                    try
+                    {
+                        Main.current_team = SelectTeam(Team_Id);
+                    }
+                    catch (SQLException ex)
+                    {
+                        throw new RuntimeException(ex);
+                    }
+                    GUI_Elements.Content_Panel.remove(GUI_Elements.Rasputin_Panel);
+                    GUI_Elements.InitializeTeamPanel();
+                    GUI_Elements.Content_Panel.add(GUI_Elements.Team_Panel, GUI_Elements.setConstraints(GridBagConstraints.BOTH,1,1,0,0));
+                    GUI_Elements.Window.revalidate();
+                    GUI_Elements.Window.repaint();
+                }
+            });
+            Teams.add(new_button);
+        }
+        return Teams;
+    }
+
+    static public Team SelectTeam(String Team_Id) throws SQLException {
+        java.sql.Connection connection = (java.sql.Connection) DriverManager.getConnection(Connection.url, Connection.user, Connection.password);
+
+        ArrayList<User> user_list = new ArrayList<>();
+
+        String query1 = "SELECT * FROM team WHERE Team_Id = ?";
+        PreparedStatement stmt1 = connection.prepareStatement(query1);
+        stmt1.setString(1, Team_Id);
+        ResultSet rs1 = stmt1.executeQuery();
+        if (rs1.next())
+        {
+            System.out.println(rs1.getString(3));
+            String query2 = "SELECT Team_Member FROM team_member WHERE Team_Id = ?";
+            PreparedStatement stmt2 = connection.prepareStatement(query2);
+            stmt2.setString(1, Team_Id);
+            ResultSet rs2 = stmt2.executeQuery();
+            while (rs2.next())
+            {
+                User new_user = Session.SelectUser(rs2.getString(1));
+                user_list.add(new_user);
+            }
+        }
+        return new Team(rs1.getString(1), rs1.getString(2), Session.SelectUser(rs1.getString(3)), user_list);
     }
 
     public void LogOut(){}
