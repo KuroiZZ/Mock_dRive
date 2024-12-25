@@ -16,4 +16,24 @@ public class Team
         Team_Leader = team_Leader;
         Team_Members = team_Members;
     }
+
+    public String getId()
+    {
+        return Id;
+    }
+
+    public String getName()
+    {
+        return Name;
+    }
+
+    public User getTeam_Leader()
+    {
+        return Team_Leader;
+    }
+
+    public ArrayList<User> getTeam_Members()
+    {
+        return Team_Members;
+    }
 }
