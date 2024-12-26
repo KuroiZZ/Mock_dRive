@@ -11,6 +11,7 @@ import org.example.User.User;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Objects;
@@ -203,6 +204,9 @@ public class Session
             System.out.println("User Added Successfully");
             stmt.close();
             connection.close();
+
+            File directory = new File("src/main/java/org/example/Files/User/" + User_Name);
+            directory.mkdirs();
         }
         else
         {

@@ -302,12 +302,7 @@ public class GUI_Elements
                 {
                     File selectedFile = fileChooser.getSelectedFile();
 
-                    File targetDirectory = new File("src/main/java/org/example/Files/" + Main.current_user.getUserName());
-
-                    if (!targetDirectory.exists())
-                    {
-                        targetDirectory.mkdirs();
-                    }
+                    File targetDirectory = new File("src/main/java/org/example/Files/User/" + Main.current_user.getUserName());
 
                     File targetFile = new File(targetDirectory, selectedFile.getName());
 

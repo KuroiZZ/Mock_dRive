@@ -5,6 +5,7 @@ import org.example.GUI.GUI_Elements;
 import org.example.Main;
 import org.example.SessionSystem.Session;
 
+import java.io.File;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -131,6 +132,9 @@ public class User
                     stmt.execute();
                     stmt.close();
                     connection.close();
+
+                    File directory = new File("src/main/java/org/example/Files/Team/" + Team_Id);
+                    directory.mkdirs();
                 }
             }
             else
