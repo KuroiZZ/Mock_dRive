@@ -52,6 +52,26 @@ public class User
 
                 stmt.execute();
 
+
+                query = "UPDATE team SET Team_Leader = ? WHERE Team_Leader = ?";
+
+                stmt = connection.prepareStatement(query);
+
+                stmt.setString(1, New_User_Name);
+                stmt.setString(2, Previous_User_Name);
+
+                stmt.execute();
+
+
+                query = "UPDATE team_member SET Team_Member = ? WHERE Team_Member = ?";
+
+                stmt = connection.prepareStatement(query);
+
+                stmt.setString(1, New_User_Name);
+                stmt.setString(2, Previous_User_Name);
+
+                stmt.execute();
+
                 stmt.close();
                 connection.close();
                 Main.current_user = Session.SelectUser(New_User_Name);
