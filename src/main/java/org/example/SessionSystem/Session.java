@@ -12,6 +12,10 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Objects;
@@ -321,6 +325,48 @@ public class Session
                     GUI_Elements.Content_Panel.add(GUI_Elements.Team_Panel, GUI_Elements.setConstraints(GridBagConstraints.BOTH,1,1,0,0));
                     GUI_Elements.Window.revalidate();
                     GUI_Elements.Window.repaint();
+                }
+            });
+            Teams.add(new_button);
+        }
+        return Teams;
+    }
+
+    static public ArrayList<JButton> GetAllTeamsS(String Team_Leader, File file) throws SQLException
+    {
+        java.sql.Connection connection = (java.sql.Connection) DriverManager.getConnection(Connection.url, Connection.user, Connection.password);
+
+        ArrayList<JButton> Teams = new ArrayList<JButton>();
+
+        String query = "SELECT Team_Name, Team_Id FROM team WHERE Team_Leader = ?";
+        PreparedStatement stmt = connection.prepareStatement(query);
+        stmt.setString(1, Team_Leader);
+        ResultSet rs = stmt.executeQuery();
+        while (rs.next())
+        {
+            JButton new_button = new JButton(rs.getString(1));
+            String Team_Id = rs.getString(2);
+            new_button.addActionListener(new ActionListener()
+            {
+                @Override
+                public void actionPerformed(ActionEvent e)
+                {
+                    File targetDirectory = new File("src/main/java/org/example/Files/Team/" + Team_Id);
+
+                    File targetFile = new File(targetDirectory, file.getName());
+
+                    try
+                    {
+                        Path sourcePath = file.toPath();
+                        Path targetPath = targetFile.toPath();
+                        Files.copy(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
+
+                        GUI_Elements.SelectForShareFrame.dispose();
+                    }
+                    catch (IOException eb)
+                    {
+                        eb.printStackTrace();
+                    }
                 }
             });
             Teams.add(new_button);
