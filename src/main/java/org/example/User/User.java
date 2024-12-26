@@ -110,8 +110,6 @@ public class User
         }
     }
 
-    public void UploadFile(){}
-
     public void CreateTeam(String TeamName, String TeammateName)
     {
         try
