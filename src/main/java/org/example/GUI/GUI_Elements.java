@@ -288,6 +288,16 @@ public class GUI_Elements
     {
         File_Panel.setBackground(Color.BLUE);
 
+        File directory = new File("src/main/java/org/example/Files/User/" + Main.current_user.getUserName());
+
+        File[] files = directory.listFiles();
+
+        for(File file : files)
+        {
+            JButton file_button = new JButton(file.getName());
+            File_Panel.add(file_button);
+        }
+
         JButton Upload_File_Button = new JButton("Upload File");
         Upload_File_Button.addActionListener(new ActionListener()
         {
@@ -311,6 +321,10 @@ public class GUI_Elements
                         Path sourcePath = selectedFile.toPath();
                         Path targetPath = targetFile.toPath();
                         Files.copy(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
+                        File_Panel.removeAll();
+                        InitializeFilePanel();
+                        Window.revalidate();
+                        Window.repaint();
                     }
                     catch (IOException eb)
                     {
@@ -349,6 +363,20 @@ public class GUI_Elements
             }
         });
         Team_Panel.add(Add_Team_Member_Button);
+
+        JButton Close_Team_Panel_Button = new JButton("Close Team Panel");
+        Close_Team_Panel_Button.addActionListener(new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                Content_Panel.remove(Team_Panel);
+                Content_Panel.add(File_Panel, setConstraints(GridBagConstraints.BOTH,1,1,0,0));
+                Window.revalidate();
+                Window.repaint();
+            }
+        });
+        Team_Panel.add(Close_Team_Panel_Button);
     }
 
     static public JPanel Profile_Panel = new JPanel();
@@ -402,6 +430,17 @@ public class GUI_Elements
             }
         });
         Profile_Panel.add(Settings_Button);
+
+        JButton Log_Out_Button = new JButton("Log Out");
+        Log_Out_Button.addActionListener(new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                Session.LogOut();
+            }
+        });
+        Profile_Panel.add(Log_Out_Button);
     }
 
     static public JPanel Create_Team_Panel = new JPanel();
