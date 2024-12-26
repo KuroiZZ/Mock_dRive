@@ -294,7 +294,25 @@ public class GUI_Elements
 
         for(File file : files)
         {
-            JButton file_button = new JButton(file.getName());
+            File_Button file_button = new File_Button(file);
+            file_button.addActionListener(new ActionListener()
+            {
+                @Override
+                public void actionPerformed(ActionEvent e)
+                {
+                    if (Desktop.isDesktopSupported())
+                    {
+                        try
+                        {
+                            Desktop.getDesktop().open(file);
+                        }
+                        catch (IOException ex)
+                        {
+                            throw new RuntimeException(ex);
+                        }
+                    }
+                }
+            });
             File_Panel.add(file_button);
         }
 
@@ -706,6 +724,33 @@ public class GUI_Elements
         InputFrame.add(validate_button);
         InputFrame.setLocationRelativeTo(GUI_Elements.Window);
         InputFrame.setVisible(true);
+    }
+
+    static public JFrame SelectForShareFrame;
+    public static void InitializeSelectForShareFrame(File file)
+    {
+        SelectForShareFrame = new JFrame();
+        SelectForShareFrame.setSize(new Dimension(300, 900));
+        SelectForShareFrame.setLayout(new FlowLayout());
+
+        ArrayList<JButton> Teams;
+        try
+        {
+            Teams = Session.GetAllTeamsS(Main.current_user.getUserName(), file);
+        }
+        catch (SQLException e)
+        {
+            throw new RuntimeException(e);
+        }
+
+        for (JButton team : Teams)
+        {
+            SelectForShareFrame.add(team);
+        }
+
+        SelectForShareFrame.setLocationRelativeTo(GUI_Elements.Window);
+        SelectForShareFrame.setVisible(true);
+
     }
 
 }
