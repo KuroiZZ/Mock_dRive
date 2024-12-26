@@ -354,7 +354,19 @@ public class Session
         return new Team(rs1.getString(1), rs1.getString(2), Session.SelectUser(rs1.getString(3)), user_list);
     }
 
-    public void LogOut(){}
+    static public void LogOut()
+    {
+        Main.current_user = null;
+        Main.current_team = null;
+        GUI_Elements.Window.getContentPane().removeAll();
+        GUI_Elements.Profile_Panel.removeAll();
+        GUI_Elements.Create_Team_Panel.removeAll();
+        GUI_Elements.File_Panel.removeAll();
+        GUI_Elements.Settings_Panel.removeAll();
+        GUI_Elements.Change_User_Name_Panel.removeAll();
+        GUI_Elements.Team_Panel.removeAll();
+        GUI_Elements.InitializeLogInMenu();
+    }
 
 
 }
