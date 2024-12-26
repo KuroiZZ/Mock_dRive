@@ -10,6 +10,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -263,26 +268,63 @@ public class GUI_Elements
     {
         InitializeProfilePanel();
         InitializeCreateTeamPanel();
-        InitializeRasputinPanel();
+        InitializeFilePanel();
         InitializeSettingsPanel();
         InitializeChangeUserNamePanel();
 
-        JPanel File_Panel = new JPanel();
-        File_Panel.setBackground(Color.RED);
+        JPanel File_Content_Panel = new JPanel();
+        File_Content_Panel.setBackground(Color.RED);
 
-        Content_Panel.add(Rasputin_Panel, setConstraints(GridBagConstraints.BOTH,1,1,0,0));
-        Content_Panel.add(File_Panel, setConstraints(GridBagConstraints.BOTH,1,1,1,0));
+        Content_Panel.add(File_Panel, setConstraints(GridBagConstraints.BOTH,1,1,0,0));
+        Content_Panel.add(File_Content_Panel, setConstraints(GridBagConstraints.BOTH,1,1,1,0));
         Content_Panel.add(Profile_Panel, setConstraints(GridBagConstraints.BOTH,1,1,2,0));
 
         Window.add(Content_Panel);
         Window.setVisible(true);
     }
 
-    static public JPanel Rasputin_Panel = new JPanel();
-    public static void InitializeRasputinPanel()
+    static public JPanel File_Panel = new JPanel();
+    public static void InitializeFilePanel()
     {
-        Rasputin_Panel.setBackground(Color.BLUE);
+        File_Panel.setBackground(Color.BLUE);
 
+        JButton Upload_File_Button = new JButton("Upload File");
+        Upload_File_Button.addActionListener(new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                JFileChooser fileChooser = new JFileChooser();
+
+                int result = fileChooser.showOpenDialog(null);
+
+                if (result == JFileChooser.APPROVE_OPTION)
+                {
+                    File selectedFile = fileChooser.getSelectedFile();
+
+                    File targetDirectory = new File("src/main/java/org/example/Files/" + Main.current_user.getUserName());
+
+                    if (!targetDirectory.exists())
+                    {
+                        targetDirectory.mkdirs();
+                    }
+
+                    File targetFile = new File(targetDirectory, selectedFile.getName());
+
+                    try
+                    {
+                        Path sourcePath = selectedFile.toPath();
+                        Path targetPath = targetFile.toPath();
+                        Files.copy(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
+                    }
+                    catch (IOException eb)
+                    {
+                        eb.printStackTrace();
+                    }
+                }
+            }
+        });
+        File_Panel.add(Upload_File_Button);
     }
 
     static public JPanel Team_Panel = new JPanel();

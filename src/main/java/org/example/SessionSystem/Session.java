@@ -311,7 +311,7 @@ public class Session
                     {
                         throw new RuntimeException(ex);
                     }
-                    GUI_Elements.Content_Panel.remove(GUI_Elements.Rasputin_Panel);
+                    GUI_Elements.Content_Panel.remove(GUI_Elements.File_Panel);
                     GUI_Elements.Team_Panel.removeAll();
                     GUI_Elements.InitializeTeamPanel();
                     GUI_Elements.Content_Panel.add(GUI_Elements.Team_Panel, GUI_Elements.setConstraints(GridBagConstraints.BOTH,1,1,0,0));
