@@ -233,8 +233,8 @@ public class User
         return Password;
     }
 
-    public String getRole()
+    public Role getRole()
     {
-        return Role.toString();
+        return Role;
     }
 }

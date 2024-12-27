@@ -2,6 +2,7 @@ package org.example.SessionSystem;
 
 import org.example.Connection;
 import org.example.GUI.GUI_Elements;
+import org.example.GUI.Request_Button;
 import org.example.Main;
 import org.example.User.Admin;
 import org.example.User.Role;
@@ -275,6 +276,27 @@ public class Session
         return logged_user;
     }
 
+    static public ArrayList<User> SelectAllCustomers() throws SQLException
+    {
+        java.sql.Connection connection = (java.sql.Connection) DriverManager.getConnection(Connection.url, Connection.user, Connection.password);
+
+        String querySelect = "SELECT * from user WHERE Role = ?";
+        PreparedStatement stmt = connection.prepareStatement(querySelect);
+        stmt.setString(1, "CUSTOMER");
+        ResultSet rs = stmt.executeQuery();
+
+        ArrayList<User> user_list = new ArrayList<User>();
+
+        while (rs.next())
+        {
+            User new_user = new User(rs.getString(1), rs.getString(2), rs.getString(3),
+                                     rs.getString(4), rs.getString(5));
+            user_list.add(new_user);
+        }
+
+        return user_list;
+    }
+
     static public User SelectUser(String User_Name) throws SQLException
     {
         java.sql.Connection connection = (java.sql.Connection) DriverManager.getConnection(Connection.url, Connection.user, Connection.password);
@@ -300,6 +322,54 @@ public class Session
                 }
         }
         return logged_user;
+    }
+
+    static public User SelectUserWId(String User_Id) throws SQLException
+    {
+        java.sql.Connection connection = (java.sql.Connection) DriverManager.getConnection(Connection.url, Connection.user, Connection.password);
+
+        String querySelect = "SELECT * from user WHERE User_Id = ?";
+        PreparedStatement stmt = connection.prepareStatement(querySelect);
+        stmt.setString(1, User_Id);
+        ResultSet rs = stmt.executeQuery();
+
+        User logged_user = null;
+
+        while (rs.next())
+        {
+            if (Objects.equals(rs.getString(6), "CUSTOMER"))
+            {
+                logged_user = new User(rs.getString(1), rs.getString(2), rs.getString(3),
+                        rs.getString(4), rs.getString(5));
+            }
+            else
+            {
+                logged_user = new Admin(rs.getString(1), rs.getString(2), rs.getString(3),
+                        rs.getString(4), rs.getString(5));
+            }
+        }
+        return logged_user;
+    }
+
+    static public ArrayList<Request_Button> GetAllRequests() throws SQLException
+    {
+        ArrayList<Request_Button> requests = new ArrayList<Request_Button>();
+
+        java.sql.Connection connection = (java.sql.Connection) DriverManager.getConnection(Connection.url, Connection.user, Connection.password);
+
+        String querySelect = "SELECT * from password_request WHERE Confirmed = ?";
+        PreparedStatement stmt = connection.prepareStatement(querySelect);
+        stmt.setBoolean(1, false);
+        ResultSet rs = stmt.executeQuery();
+
+        while (rs.next())
+        {
+            User new_user = SelectUserWId(rs.getString(1));
+            Request_Button new_request_button = new Request_Button(new_user);
+            requests.add(new_request_button);
+        }
+
+        return requests;
     }
 
     static public ArrayList<JButton> GetAllTeams(String Team_Leader) throws SQLException
@@ -339,10 +409,45 @@ public class Session
             });
             Teams.add(new_button);
         }
+
+        query = "SELECT Team_Id FROM team_member WHERE Team_Member = ?";
+        stmt = connection.prepareStatement(query);
+        stmt.setString(1, Team_Leader);
+        rs = stmt.executeQuery();
+        while (rs.next())
+        {
+            Team new_team = SelectTeam(rs.getString(1));
+
+            JButton new_button = new JButton(new_team.getName());
+            new_button.addActionListener(new ActionListener()
+            {
+                @Override
+                public void actionPerformed(ActionEvent e)
+                {
+                    try
+                    {
+                        Main.current_team = SelectTeam(new_team.getId());
+                    }
+                    catch (SQLException ex)
+                    {
+                        throw new RuntimeException(ex);
+                    }
+                    GUI_Elements.Content_Panel.remove(GUI_Elements.File_Panel);
+                    GUI_Elements.Team_Panel.removeAll();
+                    GUI_Elements.InitializeTeamPanel();
+                    GUI_Elements.Content_Panel.add(GUI_Elements.Team_Panel, GUI_Elements.setConstraints(GridBagConstraints.BOTH,1,1,0,0));
+                    GUI_Elements.Window.revalidate();
+                    GUI_Elements.Window.repaint();
+                }
+            });
+            Teams.add(new_button);
+        }
+
+
         return Teams;
     }
 
-    static public ArrayList<JButton> GetAllTeamsS(String Team_Leader, File file) throws SQLException
+    static public ArrayList<JButton> GetAllTeamsFile(String Team_Leader, File file) throws SQLException
     {
         java.sql.Connection connection = (java.sql.Connection) DriverManager.getConnection(Connection.url, Connection.user, Connection.password);
 
@@ -356,34 +461,61 @@ public class Session
         {
             JButton new_button = new JButton(rs.getString(1));
             String Team_Id = rs.getString(2);
-            new_button.addActionListener(new ActionListener()
-            {
+            new_button.addActionListener(new ActionListener() {
                 @Override
-                public void actionPerformed(ActionEvent e)
-                {
+                public void actionPerformed(ActionEvent e) {
                     File targetDirectory = new File("src/main/java/org/example/Files/Team/" + Team_Id);
 
                     File targetFile = new File(targetDirectory, file.getName());
 
-                    try
-                    {
+                    try {
                         Path sourcePath = file.toPath();
                         Path targetPath = targetFile.toPath();
                         Files.copy(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
 
-                        String logMessage = "User " +  Main.current_user.getUserName() + " shared " + file.getName() + " with " + Team_Id;
+                        String logMessage = "User " + Main.current_user.getUserName() + " shared " + file.getName() + " with " + Team_Id;
                         Loggers.team_logger.info(logMessage);
 
                         GUI_Elements.SelectForShareFrame.dispose();
-                    }
-                    catch (IOException eb)
-                    {
+                    } catch (IOException eb) {
                         eb.printStackTrace();
                     }
                 }
             });
             Teams.add(new_button);
         }
+
+            query = "SELECT Team_Id FROM team_member WHERE Team_Member = ?";
+            stmt = connection.prepareStatement(query);
+            stmt.setString(1, Team_Leader);
+            rs = stmt.executeQuery();
+            while (rs.next())
+            {
+                Team new_team = SelectTeam(rs.getString(1));
+                JButton new_button = new JButton(new_team.getName());;
+                new_button.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        File targetDirectory = new File("src/main/java/org/example/Files/Team/" + new_team.getId());
+
+                        File targetFile = new File(targetDirectory, file.getName());
+
+                        try {
+                            Path sourcePath = file.toPath();
+                            Path targetPath = targetFile.toPath();
+                            Files.copy(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
+
+                            String logMessage = "User " + Main.current_user.getUserName() + " shared " + file.getName() + " with " + new_team.getId();
+                            Loggers.team_logger.info(logMessage);
+
+                            GUI_Elements.SelectForShareFrame.dispose();
+                        } catch (IOException eb) {
+                            eb.printStackTrace();
+                        }
+                    }
+                });
+                Teams.add(new_button);
+            }
         return Teams;
     }
 
@@ -399,7 +531,6 @@ public class Session
         ResultSet rs1 = stmt1.executeQuery();
         if (rs1.next())
         {
-            System.out.println(rs1.getString(3));
             String query2 = "SELECT Team_Member FROM team_member WHERE Team_Id = ?";
             PreparedStatement stmt2 = connection.prepareStatement(query2);
             stmt2.setString(1, Team_Id);

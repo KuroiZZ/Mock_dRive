@@ -4,6 +4,7 @@ import org.example.Connection;
 import org.example.SessionSystem.Loggers;
 import org.example.Main;
 import org.example.SessionSystem.Session;
+import org.example.User.Role;
 import org.example.User.User;
 import org.mindrot.jbcrypt.BCrypt;
 
@@ -98,18 +99,28 @@ public class GUI_Elements
                     Main.current_user =  Session.LogIn(User_Name_Field.getText(), Password_Field.getText());
                     if (Main.current_user != null)
                     {
-                        if (Session.PasswordRequestAccepted(Main.current_user.getUserId()))
+                        if(Main.current_user.getRole() == Role.CUSTOMER)
                         {
-                            Window.getContentPane().removeAll();
-                            InitializeChangePasswordPanel();
-                            Window.add(Change_Password_Panel);
-                            Window.revalidate();
-                            Window.repaint();
+                            if (Session.PasswordRequestAccepted(Main.current_user.getUserId()))
+                            {
+                                Window.getContentPane().removeAll();
+                                InitializeChangePasswordPanel();
+                                Window.add(Change_Password_Panel);
+                                Window.revalidate();
+                                Window.repaint();
+                            }
+                            else
+                            {
+                                Window.getContentPane().removeAll();
+                                InitializeUserMenu();
+                                Window.revalidate();
+                                Window.repaint();
+                            }
                         }
-                        else
+                        else if (Main.current_user.getRole() == Role.ADMIN)
                         {
                             Window.getContentPane().removeAll();
-                            InitializeUserMenu();
+                            InitializeAdminMenu();
                             Window.revalidate();
                             Window.repaint();
                         }
@@ -279,6 +290,64 @@ public class GUI_Elements
         Content_Panel.add(File_Panel, setConstraints(GridBagConstraints.BOTH,1,1,0,0));
         Content_Panel.add(File_Content_Panel, setConstraints(GridBagConstraints.BOTH,1,1,1,0));
         Content_Panel.add(Profile_Panel, setConstraints(GridBagConstraints.BOTH,1,1,2,0));
+
+        Window.add(Content_Panel);
+        Window.setVisible(true);
+    }
+
+    public static void InitializeAdminMenu()
+    {
+        Content_Panel = new JPanel(new GridBagLayout());
+        Content_Panel.setBackground(Color.PINK);
+
+        JLabel User_Name_Label = new JLabel(Main.current_user.getUserName());
+        User_Name_Label.setFont(new Font(Font.SERIF, Font.BOLD, 35));
+        Content_Panel.add(User_Name_Label, setConstraints(GridBagConstraints.CENTER, 3, 1, 0, 0));
+
+        JButton Manage_Users_Button = new JButton("Manage Users");
+        Manage_Users_Button.addActionListener(new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                InitializeUsersPanel();
+                Content_Panel.removeAll();
+                Content_Panel.add(Users_Panel);
+                Window.revalidate();
+                Window.repaint();
+            }
+        });
+        Content_Panel.add(Manage_Users_Button, setConstraints(GridBagConstraints.CENTER, 1,1,0,1));
+
+        JButton Manage_Password_Button = new JButton("Manage Passwords");
+        Manage_Password_Button.addActionListener(new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                InitializeRequestsPanel();
+                Content_Panel.removeAll();
+                Content_Panel.add(Requests_Panel);
+                Window.revalidate();
+                Window.repaint();
+            }
+        });
+        Content_Panel.add(Manage_Password_Button, setConstraints(GridBagConstraints.CENTER, 1,1,1,1));
+
+        JButton Show_Log_Files = new JButton("Show Log Files");
+        Show_Log_Files.addActionListener(new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                InitializeLogFilesPanel();
+                Content_Panel.removeAll();
+                Content_Panel.add(Log_Files_Panel);
+                Window.revalidate();
+                Window.repaint();
+            }
+        });
+        Content_Panel.add(Show_Log_Files, setConstraints(GridBagConstraints.CENTER, 1,1,2,1));
 
         Window.add(Content_Panel);
         Window.setVisible(true);
@@ -740,7 +809,7 @@ public class GUI_Elements
         ArrayList<JButton> Teams;
         try
         {
-            Teams = Session.GetAllTeamsS(Main.current_user.getUserName(), file);
+            Teams = Session.GetAllTeamsFile(Main.current_user.getUserName(), file);
         }
         catch (SQLException e)
         {
@@ -755,6 +824,130 @@ public class GUI_Elements
         SelectForShareFrame.setLocationRelativeTo(GUI_Elements.Window);
         SelectForShareFrame.setVisible(true);
 
+    }
+
+    static public JPanel Users_Panel = new JPanel();
+    public static void InitializeUsersPanel()
+    {
+        Users_Panel.removeAll();
+
+        Users_Panel.setBackground(Color.PINK);
+
+        ArrayList<User> user_list;
+        try
+        {
+            user_list = Session.SelectAllCustomers();
+        }
+        catch (SQLException ex)
+        {
+            throw new RuntimeException(ex);
+        }
+
+        for(User user : user_list)
+        {
+            User_Button user_button = new User_Button(user);
+            Users_Panel.add(user_button);
+        }
+
+        JButton Return_Menu_Button = new JButton("Return Menu");
+        Return_Menu_Button.addActionListener(new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                Window.getContentPane().removeAll();
+                InitializeAdminMenu();
+                Window.revalidate();
+                Window.repaint();
+            }
+        });
+        Users_Panel.add(Return_Menu_Button);
+    }
+
+    static public JPanel Requests_Panel = new JPanel();
+    public static void InitializeRequestsPanel()
+    {
+        Requests_Panel.removeAll();
+
+        Requests_Panel.setBackground(Color.PINK);
+
+        ArrayList<Request_Button> requests;
+        try
+        {
+            requests = Session.GetAllRequests();
+        }
+        catch (SQLException ex)
+        {
+            throw new RuntimeException(ex);
+        }
+
+        for(Request_Button request : requests)
+        {
+            Requests_Panel.add(request);
+        }
+
+        JButton Return_Menu_Button = new JButton("Return Menu");
+        Return_Menu_Button.addActionListener(new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                Window.getContentPane().removeAll();
+                InitializeAdminMenu();
+                Window.revalidate();
+                Window.repaint();
+            }
+        });
+        Requests_Panel.add(Return_Menu_Button);
+    }
+
+    static public JPanel Log_Files_Panel = new JPanel();
+    public static void InitializeLogFilesPanel()
+    {
+        Log_Files_Panel.removeAll();
+
+        Log_Files_Panel.setBackground(Color.PINK);
+
+        File directory = new File("src/main/java/org/example/Logs");
+
+        File[] files = directory.listFiles();
+
+        for(File file : files) {
+            if (!file.getName().endsWith(".lck"))
+            {
+                JButton file_button = new JButton(file.getName());
+                file_button.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        if (Desktop.isDesktopSupported()) {
+                            try
+                            {
+                                Desktop.getDesktop().open(file);
+                            }
+                            catch (IOException ex)
+                            {
+                                throw new RuntimeException(ex);
+                            }
+                        }
+                    }
+                });
+                Log_Files_Panel.add(file_button);
+            }
+        }
+
+        JButton Return_Menu_Button = new JButton("Return Menu");
+        Return_Menu_Button.addActionListener(new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                Window.getContentPane().removeAll();
+                InitializeAdminMenu();
+                Window.revalidate();
+                Window.repaint();
+            }
+        });
+        Log_Files_Panel.add(Return_Menu_Button);
     }
 
 }
