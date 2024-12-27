@@ -1,6 +1,7 @@
 package org.example.GUI;
 
 import org.example.Connection;
+import org.example.SessionSystem.Loggers;
 import org.example.Main;
 import org.example.SessionSystem.Session;
 import org.example.User.User;
@@ -672,6 +673,9 @@ public class GUI_Elements
 
                             stmt.close();
                             connection.close();
+
+                            String logMessage = "User " +  Main.current_user.getUserName() + " changed password";
+                            Loggers.password_request_logger.info(logMessage);
 
                             Window.getContentPane().removeAll();
                             InitializeUserMenu();

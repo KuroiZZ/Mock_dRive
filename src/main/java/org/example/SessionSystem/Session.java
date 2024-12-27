@@ -20,6 +20,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.UUID;
+
 import org.mindrot.jbcrypt.BCrypt;
 
 import javax.swing.*;
@@ -131,7 +132,8 @@ public class Session
         return false;
     }
 
-    static public boolean PasswordRequestAlreadyExist(String User_Id) throws SQLException {
+    static public boolean PasswordRequestAlreadyExist(String User_Id) throws SQLException
+    {
         java.sql.Connection connection = (java.sql.Connection) DriverManager.getConnection(Connection.url, Connection.user, Connection.password);
 
         String querySelect = "SELECT COUNT(Requested_User_Id) from password_request WHERE Requested_User_Id = ?";
@@ -220,11 +222,15 @@ public class Session
 
     static public User LogIn(String User_Name, String Password) throws SQLException
     {
+
+
         java.sql.Connection connection = (java.sql.Connection) DriverManager.getConnection(Connection.url, Connection.user, Connection.password);
 
         if (!UserNameAlreadyExist(User_Name))
         {
             System.out.println("User name or password is incorrect");
+            String logMessage = "User " + User_Name + " login failed (User not found)";
+            Loggers.session_logger.warning(logMessage);
             return null;
         }
 
@@ -251,10 +257,14 @@ public class Session
                             rs.getString(4), rs.getString(5));
                 }
                 System.out.println("User logged in");
+                String logMessage = "User " + User_Name + " logged in successfully";
+                Loggers.session_logger.info(logMessage);
             }
             else
             {
                 System.out.println("User name or password is incorrect");
+                String logMessage = "User " + User_Name + " login failed (Incorrect password)";
+                Loggers.session_logger.warning(logMessage);
             }
         }
 
@@ -361,6 +371,9 @@ public class Session
                         Path targetPath = targetFile.toPath();
                         Files.copy(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
 
+                        String logMessage = "User " +  Main.current_user.getUserName() + " shared " + file.getName() + " with " + Team_Id;
+                        Loggers.team_logger.info(logMessage);
+
                         GUI_Elements.SelectForShareFrame.dispose();
                     }
                     catch (IOException eb)
@@ -402,6 +415,9 @@ public class Session
 
     static public void LogOut()
     {
+
+        String logMessage = "User " + Main.current_user.getUserName() + " log out successfully";
+        Loggers.session_logger.info(logMessage);
         Main.current_user = null;
         Main.current_team = null;
         GUI_Elements.Window.getContentPane().removeAll();

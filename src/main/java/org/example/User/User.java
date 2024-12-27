@@ -2,6 +2,7 @@ package org.example.User;
 
 import org.example.Connection;
 import org.example.GUI.GUI_Elements;
+import org.example.SessionSystem.Loggers;
 import org.example.Main;
 import org.example.SessionSystem.Session;
 
@@ -102,6 +103,14 @@ public class User
                 stmt.execute();
                 stmt.close();
                 connection.close();
+
+                String logMessage = "User " +  this.UserName + " send password change request";
+                Loggers.password_request_logger.info(logMessage);
+            }
+            else
+            {
+                String logMessage = "User " +  this.UserName + " send password change request";
+                Loggers.password_request_logger.info(logMessage);
             }
         }
         catch (SQLException e)
@@ -186,6 +195,9 @@ public class User
                 stmt.execute();
                 stmt.close();
                 connection.close();
+
+                String logMessage = "User " +  Main.current_user.getUserName() + " selected " + TeamMate + "as a team mate";
+                Loggers.team_logger.info(logMessage);
             }
         }
         catch (SQLException e)

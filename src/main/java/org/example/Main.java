@@ -1,6 +1,7 @@
 package org.example;
 
 import org.example.GUI.GUI_Elements;
+import org.example.SessionSystem.Loggers;
 import org.example.User.Team;
 import org.example.User.User;
 
@@ -11,6 +12,7 @@ public class Main
 
     public static void main(String[] args)
     {
+        Loggers.InitializeLoggers();
         GUI_Elements.InitializeWindowProperties();
         GUI_Elements.InitializeLogInMenu();
     }
