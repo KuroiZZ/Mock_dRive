@@ -12,6 +12,7 @@ public class Loggers
     public static final Logger password_request_logger = Logger.getLogger("Password Request");
     public static final Logger team_logger = Logger.getLogger("Team");
     public static final Logger backup_logger = Logger.getLogger("Backup");
+    public static final Logger anomaly_session_logger = Logger.getLogger("AnomalySession");
 
     public static void InitializeSessionLogger()
     {
@@ -22,6 +23,22 @@ public class Loggers
             fileHandler.setFormatter(new SimpleFormatter());
             session_logger.addHandler(fileHandler);
             session_logger.setLevel(Level.INFO);
+        }
+        catch (IOException ex)
+        {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    public static void InitializeAnomalySessionLogger()
+    {
+        FileHandler fileHandler;
+        try
+        {
+            fileHandler = new FileHandler("src/main/java/org/example/Anomalies/SessionAnomaly.txt", true);
+            fileHandler.setFormatter(new SimpleFormatter());
+            anomaly_session_logger.addHandler(fileHandler);
+            anomaly_session_logger.setLevel(Level.INFO);
         }
         catch (IOException ex)
         {

@@ -25,7 +25,6 @@ public class Process
                                 "org.example.BackupSystem.BackUp"
                         );
 
-                processBuilder.environment().put("LOG_PATH", "src/main/java/org/example/Logs/Backup.txt");
                 processBuilder.directory(new File("C:\\Users\\habil\\OneDrive\\Desktop\\Proje\\3.Sınıf\\1. Dönem\\Yazılım Geliştirme\\Odev2\\Qod"));
                 processBuilder.inheritIO();
                 process_Backup = processBuilder.start();
@@ -37,6 +36,38 @@ public class Process
         };
 
         scheduler_Backup.scheduleAtFixedRate(task, 0, 30, TimeUnit.SECONDS);
+        return process_Backup;
+    }
+
+    public static ScheduledExecutorService scheduler_Anomaly_Session;
+    public static java.lang.Process process_Anomaly_Session;
+
+    public static java.lang.Process StartSessionAnomaly()
+    {
+        scheduler_Anomaly_Session = Executors.newScheduledThreadPool(1);
+
+        Runnable task = () ->
+        {
+            try
+            {
+                ProcessBuilder processBuilder = new ProcessBuilder
+                        (
+                                "java", "-cp",
+                                System.getProperty("java.class.path"), // classpath buraya eklendi
+                                "org.example.BackupSystem.SessionAnomalyFinder"
+                        );
+
+                processBuilder.directory(new File("C:\\Users\\habil\\OneDrive\\Desktop\\Proje\\3.Sınıf\\1. Dönem\\Yazılım Geliştirme\\Odev2\\Qod"));
+                processBuilder.inheritIO();
+                process_Anomaly_Session = processBuilder.start();
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+        };
+
+        scheduler_Anomaly_Session.scheduleAtFixedRate(task, 0, 5, TimeUnit.SECONDS);
         return process_Backup;
     }
 }
