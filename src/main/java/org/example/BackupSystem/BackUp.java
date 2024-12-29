@@ -13,14 +13,12 @@ public class BackUp
 
     public static void main(String[] args)
     {
-
+        Loggers.InitializeBackupLogger();
         Work();
     }
 
     public static void Work()
     {
-        Loggers.InitializeBackupLogger();
-        
         try
         {
             if (Files.exists(TARGET_DIR))

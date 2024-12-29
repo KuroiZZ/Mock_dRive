@@ -1,6 +1,7 @@
 package org.example.Process;
 
 import java.io.File;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -9,6 +10,7 @@ public class Process
 {
     public static ScheduledExecutorService scheduler_Backup;
     public static java.lang.Process process_Backup;
+
 
     public static java.lang.Process StartBackup()
     {
@@ -137,35 +139,36 @@ public class Process
     }
 
 
-    public static ScheduledExecutorService scheduler_Watcher;
     public static java.lang.Process process_Watcher;
 
     public static java.lang.Process StartWatcher()
     {
-        scheduler_Watcher = Executors.newScheduledThreadPool(1);
-
-        Runnable task = () ->
-        {
+        CountDownLatch latch = new CountDownLatch(1);
+        Runnable task = () -> {
             try
             {
-                ProcessBuilder processBuilder = new ProcessBuilder
-                        (
-                                "java", "-cp",
-                                System.getProperty("java.class.path"), // classpath buraya eklendi
-                                "org.example.BackupSystem.FileWatcher"
-                        );
-
+                ProcessBuilder processBuilder = new ProcessBuilder(
+                        "java", "-cp", System.getProperty("java.class.path"), "org.example.BackupSystem.FileWatcher"
+                );
                 processBuilder.directory(new File("C:\\Users\\habil\\OneDrive\\Desktop\\Proje\\3.Sınıf\\1. Dönem\\Yazılım Geliştirme\\Odev2\\Qod"));
                 processBuilder.inheritIO();
                 process_Watcher = processBuilder.start();
+                latch.countDown();
             }
             catch (Exception e)
             {
                 e.printStackTrace();
             }
         };
-
-        scheduler_Watcher.scheduleAtFixedRate(task, 0, 5, TimeUnit.SECONDS);
+        new Thread(task).start();
+        try
+        {
+            latch.await();
+        }
+        catch (InterruptedException e)
+        {
+            throw new RuntimeException(e);
+        }
         return process_Watcher;
     }
 }

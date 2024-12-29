@@ -54,7 +54,7 @@ public class User_Button extends JPanel
             @Override
             public void actionPerformed(ActionEvent e)
             {
-
+                GUI_Elements.InitializeUserFileFrame(user.getUserName());
             }
         });
         this.ContentPanel.add(ShowFilesButton);
@@ -71,18 +71,6 @@ public class User_Button extends JPanel
         });
         this.ContentPanel.add(ShowTeamsButton);
 
-
-        this.DeleteUserButton = new JButton("Delete User");
-        this.DeleteUserButton.setBackground(Color.RED);
-        this.DeleteUserButton.addActionListener(new ActionListener()
-        {
-            @Override
-            public void actionPerformed(ActionEvent e)
-            {
-
-            }
-        });
-        this.ContentPanel.add(DeleteUserButton);
 
         this.add(ContentPanel);
     }

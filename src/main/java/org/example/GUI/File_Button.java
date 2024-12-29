@@ -16,7 +16,7 @@ public class File_Button extends JButton
     public File_Button(File file)
     {
         super();
-        this.setSize(new Dimension(250, 50));
+        this.setPreferredSize(new Dimension(500, 50));
 
         this.ContentPanel = new JPanel(new FlowLayout());
         this.ContentPanel.setOpaque(false);

@@ -269,7 +269,6 @@ public class Session
             }
         }
 
-
         stmt.close();
         connection.close();
 
@@ -385,6 +384,7 @@ public class Session
         while (rs.next())
         {
             JButton new_button = new JButton(rs.getString(1));
+            new_button.setPreferredSize(new Dimension(250, 50));
             String Team_Id = rs.getString(2);
             new_button.addActionListener(new ActionListener()
             {
@@ -419,6 +419,7 @@ public class Session
             Team new_team = SelectTeam(rs.getString(1));
 
             JButton new_button = new JButton(new_team.getName());
+            new_button.setPreferredSize(new Dimension(250, 50));
             new_button.addActionListener(new ActionListener()
             {
                 @Override
@@ -552,6 +553,7 @@ public class Session
         Main.current_user = null;
         Main.current_team = null;
         GUI_Elements.Window.getContentPane().removeAll();
+        GUI_Elements.Content_Panel.removeAll();
         GUI_Elements.Profile_Panel.removeAll();
         GUI_Elements.Create_Team_Panel.removeAll();
         GUI_Elements.File_Panel.removeAll();
