@@ -13,34 +13,69 @@ public class Loggers
     public static final Logger team_logger = Logger.getLogger("Team");
     public static final Logger backup_logger = Logger.getLogger("Backup");
 
-    public static void InitializeLoggers()
+    public static void InitializeSessionLogger()
     {
         FileHandler fileHandler;
         try
         {
-            fileHandler = new FileHandler("src/main/java/org/example/Logs/Session.txt", true); // 'true' for appending
+            fileHandler = new FileHandler("src/main/java/org/example/Logs/Session.txt", true);
             fileHandler.setFormatter(new SimpleFormatter());
             session_logger.addHandler(fileHandler);
             session_logger.setLevel(Level.INFO);
-
-            fileHandler = new FileHandler("src/main/java/org/example/Logs/PasswordRequest.txt", true); // 'true' for appending
-            fileHandler.setFormatter(new SimpleFormatter());
-            password_request_logger.addHandler(fileHandler);
-            password_request_logger.setLevel(Level.INFO);
-
-            fileHandler = new FileHandler("src/main/java/org/example/Logs/Team.txt", true); // 'true' for appending
-            fileHandler.setFormatter(new SimpleFormatter());
-            team_logger.addHandler(fileHandler);
-            team_logger.setLevel(Level.INFO);
-
-            fileHandler = new FileHandler("src/main/java/org/example/Logs/Backup.txt", true); // 'true' for appending
-            fileHandler.setFormatter(new SimpleFormatter());
-            backup_logger.addHandler(fileHandler);
-            backup_logger.setLevel(Level.INFO);
-
-        } catch (IOException ex)
+        }
+        catch (IOException ex)
         {
             throw new RuntimeException(ex);
         }
     }
+
+    public static void InitializePasswordRequestLogger()
+    {
+        FileHandler fileHandler;
+        try
+        {
+            fileHandler = new FileHandler("src/main/java/org/example/Logs/PasswordRequest.txt", true);
+            fileHandler.setFormatter(new SimpleFormatter());
+            password_request_logger.addHandler(fileHandler);
+            password_request_logger.setLevel(Level.INFO);
+        }
+        catch (IOException ex)
+        {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    public static void InitializeTeamLogger()
+    {
+        FileHandler fileHandler;
+        try
+        {
+            fileHandler = new FileHandler("src/main/java/org/example/Logs/Team.txt", true);
+            fileHandler.setFormatter(new SimpleFormatter());
+            team_logger.addHandler(fileHandler);
+            team_logger.setLevel(Level.INFO);
+
+        }
+        catch (IOException ex)
+        {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    public static void InitializeBackupLogger()
+    {
+        FileHandler fileHandler;
+        try
+        {
+            fileHandler = new FileHandler("src/main/java/org/example/Logs/Backup.txt", true);
+            fileHandler.setFormatter(new SimpleFormatter());
+            backup_logger.addHandler(fileHandler);
+            backup_logger.setLevel(Level.INFO);
+        }
+        catch (IOException ex)
+        {
+            throw new RuntimeException(ex);
+        }
+    }
+
 }
