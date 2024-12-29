@@ -23,6 +23,7 @@ public class Main
         Process.StartBackup();
         Process.StartSessionAnomaly();
         Process.StartPasswordRequestAnomaly();
+        Process.StartBackupAnomaly();
 
     }
 }

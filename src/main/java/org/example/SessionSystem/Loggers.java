@@ -14,6 +14,7 @@ public class Loggers
     public static final Logger backup_logger = Logger.getLogger("Backup");
     public static final Logger anomaly_session_logger = Logger.getLogger("AnomalySession");
     public static final Logger anomaly_password_request_logger = Logger.getLogger("AnomalyPasswordRequest");
+    public static final Logger anomaly_backup_logger = Logger.getLogger("anomaly_backup_logger");
 
     public static void InitializeSessionLogger()
     {
@@ -105,6 +106,22 @@ public class Loggers
             fileHandler.setFormatter(new SimpleFormatter());
             backup_logger.addHandler(fileHandler);
             backup_logger.setLevel(Level.INFO);
+        }
+        catch (IOException ex)
+        {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    public static void InitializeAnomalyBackupLogger()
+    {
+        FileHandler fileHandler;
+        try
+        {
+            fileHandler = new FileHandler("src/main/java/org/example/Anomalies/BackupAnomaly.txt", true);
+            fileHandler.setFormatter(new SimpleFormatter());
+            anomaly_backup_logger.addHandler(fileHandler);
+            anomaly_backup_logger.setLevel(Level.INFO);
         }
         catch (IOException ex)
         {
