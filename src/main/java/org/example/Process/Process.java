@@ -135,4 +135,37 @@ public class Process
         scheduler_Backup_Request.scheduleAtFixedRate(task, 0, 5, TimeUnit.SECONDS);
         return process_Backup;
     }
+
+
+    public static ScheduledExecutorService scheduler_Watcher;
+    public static java.lang.Process process_Watcher;
+
+    public static java.lang.Process StartWatcher()
+    {
+        scheduler_Watcher = Executors.newScheduledThreadPool(1);
+
+        Runnable task = () ->
+        {
+            try
+            {
+                ProcessBuilder processBuilder = new ProcessBuilder
+                        (
+                                "java", "-cp",
+                                System.getProperty("java.class.path"), // classpath buraya eklendi
+                                "org.example.BackupSystem.FileWatcher"
+                        );
+
+                processBuilder.directory(new File("C:\\Users\\habil\\OneDrive\\Desktop\\Proje\\3.Sınıf\\1. Dönem\\Yazılım Geliştirme\\Odev2\\Qod"));
+                processBuilder.inheritIO();
+                process_Watcher = processBuilder.start();
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+        };
+
+        scheduler_Watcher.scheduleAtFixedRate(task, 0, 5, TimeUnit.SECONDS);
+        return process_Watcher;
+    }
 }

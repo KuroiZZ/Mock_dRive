@@ -24,6 +24,7 @@ public class Main
         Process.StartSessionAnomaly();
         Process.StartPasswordRequestAnomaly();
         Process.StartBackupAnomaly();
+        //Process.StartWatcher();
 
     }
 }
