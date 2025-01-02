@@ -1160,4 +1160,31 @@ public class GUI_Elements
         Log_Files_Panel.add(Return_Menu_Button, setConstraints(GridBagConstraints.NONE, 1, 1, 0, index));
     }
 
+    static public JFrame User_Team_Frame;
+    public static void InitializeUserTeamFrame(String User_Name)
+    {
+        User_Team_Frame = new JFrame();
+        User_Team_Frame.setSize(new Dimension(300, 900));
+        User_Team_Frame.setLayout(new FlowLayout());
+
+        ArrayList<JButton> Teams;
+        try
+        {
+            Teams = Session.GetAllTeams(User_Name);
+        }
+        catch (SQLException e)
+        {
+            throw new RuntimeException(e);
+        }
+
+        for (JButton team : Teams)
+        {
+            team.setEnabled(false);
+            User_Team_Frame.add(team);
+        }
+
+        User_Team_Frame.setLocationRelativeTo(GUI_Elements.Window);
+        User_Team_Frame.setVisible(true);
+    }
+
 }

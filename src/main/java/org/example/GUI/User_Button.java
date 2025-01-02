@@ -66,7 +66,7 @@ public class User_Button extends JPanel
             @Override
             public void actionPerformed(ActionEvent e)
             {
-
+                GUI_Elements.InitializeUserTeamFrame(user.getUserName());
             }
         });
         this.ContentPanel.add(ShowTeamsButton);

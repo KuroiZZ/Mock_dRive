@@ -98,7 +98,7 @@ public class SessionAnomalyFinder
 
                 if (diff1 <= 30 && diff2 <= 30)
                 {
-                    Loggers.anomaly_session_logger.info("User " + userName + " try to log 3 times in 30 seconds.");
+                    Loggers.anomaly_session_logger.info("User " + userName + " failed to log in 3 times in 30 seconds.");
                     break;
                 }
             }
